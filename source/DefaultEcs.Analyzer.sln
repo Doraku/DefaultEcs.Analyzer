@@ -15,6 +15,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		DefaultEcs.Analyzer\DefaultEcs.Analyzer.Release.csproj = DefaultEcs.Analyzer\DefaultEcs.Analyzer.Release.csproj
 		DefaultEcs.Analyzer\DefaultEcs.Analyzer.targets = DefaultEcs.Analyzer\DefaultEcs.Analyzer.targets
 		..\LICENSE.md = ..\LICENSE.md
+		..\README.md = ..\README.md
 		..\Release.bat = ..\Release.bat
 	EndProjectSection
 EndProject

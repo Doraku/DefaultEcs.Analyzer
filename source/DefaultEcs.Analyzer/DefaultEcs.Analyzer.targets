@@ -29,5 +29,7 @@
     <RepositoryUrl>https://github.com/Doraku/DefaultEcs.Analyzer.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>gamedev game-development game-engine ecs entity-component-system</PackageTags>
+
+    <DevelopmentDependency>true</DevelopmentDependency>
   </PropertyGroup>
 </Project>
