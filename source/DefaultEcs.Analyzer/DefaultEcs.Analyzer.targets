@@ -1,0 +1,33 @@
+﻿<Project>
+  <PropertyGroup Label="Compilation">
+    <LangVersion>latest</LangVersion>
+    <TargetFrameworks>
+      netstandard2.0;
+    </TargetFrameworks>
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="DefaultEcs.Analyzer.targets" />
+    <None Include="..\..\image\logo.png" Pack="true" PackagePath="\" Visible="false"/>
+  </ItemGroup>
+
+  <ItemGroup Label="Reference">
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="2.9.8" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.4.0" PrivateAssets="all" />
+  </ItemGroup>
+
+  <PropertyGroup Label="Package">
+    <Authors>Paillat Laszlo</Authors>
+    <AssemblyName>DefaultEcs.Analyzer</AssemblyName>
+    <AssemblyTitle>DefaultEcs.Analyzer</AssemblyTitle>
+    <PackageId>DefaultEcs.Analyzer</PackageId>
+    <Description>Roslyn analyzers for DefaultEcs users.</Description>
+    <PackageIcon>logo.png</PackageIcon>
+    <PackageProjectUrl>https://github.com/Doraku/DefaultEcs.Analyzer</PackageProjectUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/Doraku/DefaultEcs.Analyzer.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>gamedev game-development game-engine ecs entity-component-system</PackageTags>
+  </PropertyGroup>
+</Project>
