@@ -9,7 +9,11 @@ namespace DefaultEcs.Analyzer
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class WithPredicateAttributeAnalyser : DiagnosticAnalyzer
     {
-        public static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(
+        private static readonly ImmutableHashSet<string> _supportedTypes = ImmutableHashSet.Create(
+            "DefaultEcs.System.AEntitySystem<T>",
+            "DefaultEcs.System.AEntityBufferedSystem<T>");
+
+        public static readonly DiagnosticDescriptor InvalidSignatureRule = new DiagnosticDescriptor(
             "DEA0002",
             "WithPredicateAttribute used on an invalid method",
             "Remove WithPredicateAttribute from the '{0}' method or change the method signature.",
@@ -18,7 +22,16 @@ namespace DefaultEcs.Analyzer
             true,
             "WithPredicateAttribute should only be used on method with the ComponentPredicate signature.");
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
+        public static readonly DiagnosticDescriptor InvalidBaseTypeRule = new DiagnosticDescriptor(
+            "DEA0003",
+            "WithPredicateAttribute used on a method which is not a member of DefaultEcs.System.AEntitySystem or DefaultEcs.System.AEntityBufferedSystem",
+            "Remove WithPredicateAttribute from the '{0}' method.",
+            DiagnosticCategory.Correctness,
+            DiagnosticSeverity.Info,
+            true,
+            "WithPredicateAttribute should only be used on method member of DefaultEcs.System.AEntitySystem or DefaultEcs.System.AEntityBufferedSystem.");
+
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(InvalidSignatureRule, InvalidBaseTypeRule);
 
         public override void Initialize(AnalysisContext context)
         {
@@ -27,13 +40,21 @@ namespace DefaultEcs.Analyzer
             context.RegisterSymbolAction(AnalyzeSymbol, SymbolKind.Method);
         }
 
+        private static bool IsDerivedFromCorrectType(INamedTypeSymbol type) => type is null ? false : (_supportedTypes.Contains(type.ConstructedFrom.ToString()) || IsDerivedFromCorrectType(type.BaseType));
+
         private static void AnalyzeSymbol(SymbolAnalysisContext context)
         {
             if (context.Symbol is IMethodSymbol method
-                && method.GetAttributes().Any(a => a.ToString() == "DefaultEcs.System.WithPredicateAttribute")
-                && (method.ReturnType.SpecialType != SpecialType.System_Boolean || method.Parameters.Length != 1 || method.Parameters[0].RefKind != RefKind.In))
+                && method.GetAttributes().Any(a => a.ToString() == "DefaultEcs.System.WithPredicateAttribute"))
             {
-                context.ReportDiagnostic(Diagnostic.Create(Rule, method.Locations[0], method.Name));
+                if (!IsDerivedFromCorrectType(method.ContainingType))
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(InvalidBaseTypeRule, method.Locations[0], method.Name));
+                }
+                else if (method.ReturnType.SpecialType != SpecialType.System_Boolean || method.Parameters.Length != 1 || method.Parameters[0].RefKind != RefKind.In)
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(InvalidSignatureRule, method.Locations[0], method.Name));
+                }
             }
         }
     }
