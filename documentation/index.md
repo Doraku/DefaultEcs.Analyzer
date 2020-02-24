@@ -5,6 +5,7 @@ ID | Title | Category
 [DEA0001](DEA0001.md) | SubscribeAttribute used on an invalid method | Runtime Error
 [DEA0002](DEA0002.md) | WithPredicateAttribute used on an invalid method | Runtime Error
 [DEA0003](DEA0003.md) | WithPredicateAttribute used on a method which is not a member of DefaultEcs.System.AEntitySystem or DefaultEcs.System.AEntityBufferedSystem | Correctness
+[DEA0004](DEA0004.md) | Component attribute used on a type which is not derived from DefaultEcs.System.AEntitySystem or DefaultEcs.System.AEntityBufferedSystem | Correctness
 
 # Diagnostic Suppressors
 

@@ -128,7 +128,6 @@ namespace DummyNamespace
             VerifyCSharpDiagnostic(code, expected);
         }
 
-
         [Fact]
         public void Should_report_DEA0003_When_invalid_base_type()
         {
