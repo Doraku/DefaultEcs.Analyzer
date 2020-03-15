@@ -13,3 +13,4 @@ ID | Suppressed ID | Justification
 ---- | --- | --- |
 [DES0001](DES0001.md) | IDE0051 | Private member is used by reflection.
 [DES0002](DES0002.md) | IDE0051 | Private member is used by reflection.
+[DES0003](DES0003.md) | RCS1242 | Signature is dictated by IPublisher.

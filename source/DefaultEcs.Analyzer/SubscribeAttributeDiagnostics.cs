@@ -41,22 +41,34 @@ namespace DefaultEcs.Analyzer
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class SubscribeAttributeSuppressor : DiagnosticSuppressor
     {
-        public static readonly SuppressionDescriptor Rule = new SuppressionDescriptor(
+        public static readonly SuppressionDescriptor UnusedRule = new SuppressionDescriptor(
             "DES0001",
             "IDE0051",
             "Private member is used by reflection.");
 
-        public override ImmutableArray<SuppressionDescriptor> SupportedSuppressions => ImmutableArray.Create(Rule);
+        public static readonly SuppressionDescriptor InRule = new SuppressionDescriptor(
+            "DES0003",
+            "RCS1242",
+            "Signature is dictated by IPublisher.");
+
+        public override ImmutableArray<SuppressionDescriptor> SupportedSuppressions => ImmutableArray.Create(UnusedRule, InRule);
 
         public override void ReportSuppressions(SuppressionAnalysisContext context)
         {
-            foreach (Diagnostic diagnostic in context.ReportedDiagnostics.Where(d => d.Id == Rule.SuppressedDiagnosticId))
+            foreach (Diagnostic diagnostic in context.ReportedDiagnostics)
             {
                 if (diagnostic.Location.SourceTree.GetRoot(context.CancellationToken).FindNode(diagnostic.Location.SourceSpan) is MethodDeclarationSyntax methodDeclaration
                     && context.GetSemanticModel(diagnostic.Location.SourceTree).GetDeclaredSymbol(methodDeclaration) is IMethodSymbol method
                     && method.GetAttributes().Any(a => a.ToString() == "DefaultEcs.SubscribeAttribute"))
                 {
-                    context.ReportSuppression(Suppression.Create(Rule, diagnostic));
+                    if (diagnostic.Id == UnusedRule.SuppressedDiagnosticId)
+                    {
+                        context.ReportSuppression(Suppression.Create(UnusedRule, diagnostic));
+                    }
+                    else if (diagnostic.Id == InRule.SuppressedDiagnosticId)
+                    {
+                        context.ReportSuppression(Suppression.Create(InRule, diagnostic));
+                    }
                 }
             }
         }
