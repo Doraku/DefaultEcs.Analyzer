@@ -1,7 +1,7 @@
 ﻿using System.Collections.Immutable;
 using System.Linq;
+using DefaultEcs.Analyzer.Extension;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace DefaultEcs.Analyzer
@@ -78,8 +78,7 @@ namespace DefaultEcs.Analyzer
         {
             foreach (Diagnostic diagnostic in context.ReportedDiagnostics)
             {
-                if (diagnostic.Location.SourceTree.GetRoot(context.CancellationToken).FindNode(diagnostic.Location.SourceSpan) is MethodDeclarationSyntax methodDeclaration
-                    && context.GetSemanticModel(diagnostic.Location.SourceTree).GetDeclaredSymbol(methodDeclaration) is IMethodSymbol method
+                if (diagnostic.TryGetMethodSymbol(context, out IMethodSymbol method)
                     && method.GetAttributes().Any(a => a.ToString() == "DefaultEcs.System.WithPredicateAttribute"))
                 {
                     if (diagnostic.Id == UnusedRule.SuppressedDiagnosticId)
