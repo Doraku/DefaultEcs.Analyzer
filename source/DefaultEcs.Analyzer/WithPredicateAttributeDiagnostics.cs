@@ -40,7 +40,7 @@ namespace DefaultEcs.Analyzer
             context.RegisterSymbolAction(AnalyzeSymbol, SymbolKind.Method);
         }
 
-        private static bool IsDerivedFromCorrectType(INamedTypeSymbol type) => type is null ? false : (_supportedTypes.Contains(type.ConstructedFrom.ToString()) || IsDerivedFromCorrectType(type.BaseType));
+        private static bool IsDerivedFromCorrectType(INamedTypeSymbol type) => !(type is null) && (_supportedTypes.Contains(type.ConstructedFrom.ToString()) || IsDerivedFromCorrectType(type.BaseType));
 
         private static void AnalyzeSymbol(SymbolAnalysisContext context)
         {

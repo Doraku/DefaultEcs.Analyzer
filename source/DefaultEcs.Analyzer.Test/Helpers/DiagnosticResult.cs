@@ -41,7 +41,7 @@ namespace TestHelper
         {
             get
             {
-                return locations ?? (locations = new DiagnosticResultLocation[] { });
+                return locations ??= new DiagnosticResultLocation[] { };
             }
 
             set
