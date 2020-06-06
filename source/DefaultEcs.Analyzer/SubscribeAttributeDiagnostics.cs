@@ -1,5 +1,4 @@
 using System.Collections.Immutable;
-using System.Linq;
 using DefaultEcs.Analyzer.Extension;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -7,7 +6,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace DefaultEcs.Analyzer
 {
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    public class SubscribeAttributeAnalyser : DiagnosticAnalyzer
+    public sealed class SubscribeAttributeAnalyser : DiagnosticAnalyzer
     {
         public static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(
             "DEA0001",
@@ -30,7 +29,7 @@ namespace DefaultEcs.Analyzer
         private static void AnalyzeSymbol(SymbolAnalysisContext context)
         {
             if (context.Symbol is IMethodSymbol method
-                && method.GetAttributes().Any(a => a.ToString() == "DefaultEcs.SubscribeAttribute")
+                && method.HasSubscribeAttribute()
                 && (!method.ReturnsVoid || method.Parameters.Length != 1 || method.Parameters[0].RefKind != RefKind.In))
             {
                 context.ReportDiagnostic(Diagnostic.Create(Rule, method.Locations[0], method.Name));
@@ -39,7 +38,7 @@ namespace DefaultEcs.Analyzer
     }
 
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    public class SubscribeAttributeSuppressor : DiagnosticSuppressor
+    public sealed class SubscribeAttributeSuppressor : DiagnosticSuppressor
     {
         public static readonly SuppressionDescriptor UnusedRule = new SuppressionDescriptor(
             "DES0001",
@@ -57,8 +56,7 @@ namespace DefaultEcs.Analyzer
         {
             foreach (Diagnostic diagnostic in context.ReportedDiagnostics)
             {
-                if (diagnostic.TryGetMethodSymbol(context, out IMethodSymbol method)
-                    && method.GetAttributes().Any(a => a.ToString() == "DefaultEcs.SubscribeAttribute"))
+                if (diagnostic.TryGetMethodSymbol(context, out IMethodSymbol method) && method.HasSubscribeAttribute())
                 {
                     if (diagnostic.Id == UnusedRule.SuppressedDiagnosticId)
                     {

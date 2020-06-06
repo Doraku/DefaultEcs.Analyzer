@@ -1,5 +1,4 @@
 ﻿using System.Collections.Immutable;
-using System.Linq;
 using DefaultEcs.Analyzer.Extension;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -7,12 +6,8 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace DefaultEcs.Analyzer
 {
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    public class WithPredicateAttributeAnalyser : DiagnosticAnalyzer
+    public sealed class WithPredicateAttributeAnalyser : DiagnosticAnalyzer
     {
-        private static readonly ImmutableHashSet<string> _supportedTypes = ImmutableHashSet.Create(
-            "DefaultEcs.System.AEntitySystem<T>",
-            "DefaultEcs.System.AEntityBufferedSystem<T>");
-
         public static readonly DiagnosticDescriptor InvalidSignatureRule = new DiagnosticDescriptor(
             "DEA0002",
             "WithPredicateAttribute used on an invalid method",
@@ -40,14 +35,11 @@ namespace DefaultEcs.Analyzer
             context.RegisterSymbolAction(AnalyzeSymbol, SymbolKind.Method);
         }
 
-        private static bool IsDerivedFromCorrectType(INamedTypeSymbol type) => !(type is null) && (_supportedTypes.Contains(type.ConstructedFrom.ToString()) || IsDerivedFromCorrectType(type.BaseType));
-
         private static void AnalyzeSymbol(SymbolAnalysisContext context)
         {
-            if (context.Symbol is IMethodSymbol method
-                && method.GetAttributes().Any(a => a.ToString() == "DefaultEcs.System.WithPredicateAttribute"))
+            if (context.Symbol is IMethodSymbol method && method.HasWithPredicateAttribute())
             {
-                if (!IsDerivedFromCorrectType(method.ContainingType))
+                if (!method.ContainingType.IsEntitySystem())
                 {
                     context.ReportDiagnostic(Diagnostic.Create(InvalidBaseTypeRule, method.Locations[0], method.Name));
                 }
@@ -60,7 +52,7 @@ namespace DefaultEcs.Analyzer
     }
 
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    public class WithPredicateAttributeSuppressor : DiagnosticSuppressor
+    public sealed class WithPredicateAttributeSuppressor : DiagnosticSuppressor
     {
         public static readonly SuppressionDescriptor UnusedRule = new SuppressionDescriptor(
             "DES0002",
@@ -78,8 +70,7 @@ namespace DefaultEcs.Analyzer
         {
             foreach (Diagnostic diagnostic in context.ReportedDiagnostics)
             {
-                if (diagnostic.TryGetMethodSymbol(context, out IMethodSymbol method)
-                    && method.GetAttributes().Any(a => a.ToString() == "DefaultEcs.System.WithPredicateAttribute"))
+                if (diagnostic.TryGetMethodSymbol(context, out IMethodSymbol method) && method.HasWithPredicateAttribute())
                 {
                     if (diagnostic.Id == UnusedRule.SuppressedDiagnosticId)
                     {

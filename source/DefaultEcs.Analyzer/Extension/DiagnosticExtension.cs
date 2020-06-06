@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace DefaultEcs.Analyzer.Extension
 {
-    public static class DiagnosticExtension
+    internal static class DiagnosticExtension
     {
         public static bool TryGetMethodSymbol(this Diagnostic diagnostic, SuppressionAnalysisContext context, out IMethodSymbol methodSymbol)
         {
