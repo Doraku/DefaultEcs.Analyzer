@@ -32,7 +32,7 @@ namespace DefaultEcs.Analyzer
                 && method.HasSubscribeAttribute()
                 && (!method.ReturnsVoid || method.Parameters.Length != 1 || method.Parameters[0].RefKind != RefKind.In))
             {
-                context.ReportDiagnostic(Diagnostic.Create(Rule, method.Locations[0], method.Name));
+                context.ReportDiagnostic(Rule, method.Locations[0], method.Name);
             }
         }
     }
@@ -58,14 +58,8 @@ namespace DefaultEcs.Analyzer
             {
                 if (diagnostic.TryGetMethodSymbol(context, out IMethodSymbol method) && method.HasSubscribeAttribute())
                 {
-                    if (diagnostic.Id == UnusedRule.SuppressedDiagnosticId)
-                    {
-                        context.ReportSuppression(Suppression.Create(UnusedRule, diagnostic));
-                    }
-                    else if (diagnostic.Id == InRule.SuppressedDiagnosticId)
-                    {
-                        context.ReportSuppression(Suppression.Create(InRule, diagnostic));
-                    }
+                    context.ReportSuppression(UnusedRule, diagnostic);
+                    context.ReportSuppression(InRule, diagnostic);
                 }
             }
         }

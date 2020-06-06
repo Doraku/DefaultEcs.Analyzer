@@ -41,11 +41,11 @@ namespace DefaultEcs.Analyzer
             {
                 if (!method.ContainingType.IsEntitySystem())
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(InvalidBaseTypeRule, method.Locations[0], method.Name));
+                    context.ReportDiagnostic(InvalidBaseTypeRule, method.Locations[0], method.Name);
                 }
                 else if (method.ReturnType.SpecialType != SpecialType.System_Boolean || method.Parameters.Length != 1 || method.Parameters[0].RefKind != RefKind.In)
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(InvalidSignatureRule, method.Locations[0], method.Name));
+                    context.ReportDiagnostic(InvalidSignatureRule, method.Locations[0], method.Name);
                 }
             }
         }
@@ -72,14 +72,8 @@ namespace DefaultEcs.Analyzer
             {
                 if (diagnostic.TryGetMethodSymbol(context, out IMethodSymbol method) && method.HasWithPredicateAttribute())
                 {
-                    if (diagnostic.Id == UnusedRule.SuppressedDiagnosticId)
-                    {
-                        context.ReportSuppression(Suppression.Create(UnusedRule, diagnostic));
-                    }
-                    else if (diagnostic.Id == InRule.SuppressedDiagnosticId)
-                    {
-                        context.ReportSuppression(Suppression.Create(InRule, diagnostic));
-                    }
+                    context.ReportSuppression(UnusedRule, diagnostic);
+                    context.ReportSuppression(InRule, diagnostic);
                 }
             }
         }

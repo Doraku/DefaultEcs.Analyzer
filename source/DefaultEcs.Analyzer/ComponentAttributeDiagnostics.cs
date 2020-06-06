@@ -34,7 +34,7 @@ namespace DefaultEcs.Analyzer
             {
                 foreach (AttributeData attribute in type.GetComponentAttributes())
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(InvalidBaseTypeRule, type.Locations[0], type.Name, attribute.AttributeClass.Name));
+                    context.ReportDiagnostic(InvalidBaseTypeRule, type.Locations[0], type.Name, attribute.AttributeClass.Name);
                 }
             }
         }
