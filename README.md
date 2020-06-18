@@ -4,7 +4,7 @@ The main repo for DefaultEcs is [here](https://github.com/Doraku/DefaultEcs/), t
 
 [Here](https://github.com/Doraku/DefaultEcs.Analyzer/blob/master/documentation/index.md) is the list of analyzers and suppressors defined in this project.
 
-[![NuGet](https://buildstats.info/nuget/DefaultEcs)](https://www.nuget.org/packages/DefaultEcs.Analyzer)
+[![NuGet](https://buildstats.info/nuget/DefaultEcs.Analyzer)](https://www.nuget.org/packages/DefaultEcs.Analyzer)
 [![Join the chat at https://gitter.im/Doraku/DefaultEcs](https://badges.gitter.im/Doraku/DefaultEcs.svg)](https://gitter.im/Doraku/DefaultEcs?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 - [Release note](./documentation/RELEASENOTE.md 'Release note')
