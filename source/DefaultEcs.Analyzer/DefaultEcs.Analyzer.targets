@@ -8,13 +8,13 @@
   <ItemGroup>
     <None Remove="DefaultEcs.Analyzer.targets" />
     <None Include="..\..\image\logo.png" Pack="true" PackagePath="\" Visible="false"/>
-    <None Update="tools\*.ps1" CopyToOutputDirectory="Always" Pack="true" PackagePath="" />
+    <None Update="tools\*.ps1" CopyToOutputDirectory="Always" Pack="true" PackagePath="tools" />
     <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
   </ItemGroup>
   
   <ItemGroup Label="Reference">
-    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.0.0" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.6.0" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.1" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.8.0-5.final" PrivateAssets="all" />
   </ItemGroup>
 
   <PropertyGroup Label="Package">
@@ -31,6 +31,7 @@
     <PackageTags>gamedev game-development game-engine ecs entity-component-system</PackageTags>
 
     <IncludeBuildOutput>false</IncludeBuildOutput>
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
     <DevelopmentDependency>true</DevelopmentDependency>
     <NoPackageAnalysis>true</NoPackageAnalysis>
   </PropertyGroup>

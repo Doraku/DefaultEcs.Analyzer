@@ -1,22 +1,21 @@
 ﻿using System.Collections.Immutable;
 using DefaultEcs.Analyzer.Extension;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
-namespace DefaultEcs.Analyzer
+namespace DefaultEcs.Analyzer.Diagnostics
 {
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    public sealed class AEntitySystemAnalyser : DiagnosticAnalyzer
+    public sealed class SubscribeAttributeAnalyzer : DiagnosticAnalyzer
     {
         public static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(
-            "DEA0005",
-            "Entity modification method '{0}' used inside the Update method of AEntitySystem",
-            "Use an EntityCommandRecorder or change the system to an AEntityBufferedSystem.",
+            "DEA0001",
+            "SubscribeAttribute used on an invalid method",
+            "Remove SubscribeAttribute from the '{0}' method or change the method signature",
             DiagnosticCategory.RuntimeError,
-            DiagnosticSeverity.Warning,
+            DiagnosticSeverity.Error,
             true,
-            "Entity modification methods are not thread safe and should not be used inside the Update method of AEntitySystem.");
+            "SubscribeAttribute should only be used on method with the MessageHandler signature.");
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
@@ -30,15 +29,10 @@ namespace DefaultEcs.Analyzer
         private static void AnalyzeSymbol(SymbolAnalysisContext context)
         {
             if (context.Symbol is IMethodSymbol method
-                && method.IsAEntitySystemOverride())
+                && method.HasSubscribeAttribute()
+                && (!method.ReturnsVoid || method.Parameters.Length != 1 || method.Parameters[0].RefKind != RefKind.In))
             {
-                foreach ((InvocationExpressionSyntax invocation, IMethodSymbol entityMethod) in method.GetEntityInvocations(context))
-                {
-                    if (entityMethod.Name != "Get")
-                    {
-                        context.ReportDiagnostic(Rule, invocation.GetLocation(), entityMethod.Name);
-                    }
-                }
+                context.ReportDiagnostic(Diagnostic.Create(Rule, method.Locations[0], method.Name));
             }
         }
     }

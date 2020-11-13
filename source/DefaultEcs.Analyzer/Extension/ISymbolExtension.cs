@@ -28,5 +28,7 @@ namespace DefaultEcs.Analyzer.Extension
         public static bool HasSubscribeAttribute(this ISymbol symbol) => symbol.GetAttributes().Any(a => a.ToString() == "DefaultEcs.SubscribeAttribute");
 
         public static bool HasWithPredicateAttribute(this ISymbol symbol) => symbol.GetAttributes().Any(a => a.ToString() == "DefaultEcs.System.WithPredicateAttribute");
+
+        public static bool HasUpdateAttribute(this ISymbol symbol) => symbol.GetAttributes().Any(a => a.ToString() == "DefaultEcs.System.UpdateAttribute");
     }
 }

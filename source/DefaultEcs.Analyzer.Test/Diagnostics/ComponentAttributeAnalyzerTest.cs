@@ -2,7 +2,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 using TestHelper;
 using Xunit;
 
-namespace DefaultEcs.Analyzer.Test
+namespace DefaultEcs.Analyzer.Diagnostics.Test
 {
     public class ComponentAttributeAnalyserTest : DiagnosticVerifier
     {
@@ -43,9 +43,9 @@ namespace DummyNamespace
 
             DiagnosticResult expected = new DiagnosticResult
             {
-                Id = ComponentAttributeAnalyser.InvalidBaseTypeRule.Id,
-                Message = string.Format((string)ComponentAttributeAnalyser.InvalidBaseTypeRule.MessageFormat, "DummyClass", "WithAttribute"),
-                Severity = ComponentAttributeAnalyser.InvalidBaseTypeRule.DefaultSeverity,
+                Id = ComponentAttributeAnalyzer.InvalidBaseTypeRule.Id,
+                Message = string.Format((string)ComponentAttributeAnalyzer.InvalidBaseTypeRule.MessageFormat, "DummyClass", "WithAttribute"),
+                Severity = ComponentAttributeAnalyzer.InvalidBaseTypeRule.DefaultSeverity,
                 Locations = new[]
                 {
                     new DiagnosticResultLocation("Test0.cs", 7, 11)
@@ -59,7 +59,7 @@ namespace DummyNamespace
 
         #region DiagnosticVerifier
 
-        protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer() => new ComponentAttributeAnalyser();
+        protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer() => new ComponentAttributeAnalyzer();
 
         #endregion
     }

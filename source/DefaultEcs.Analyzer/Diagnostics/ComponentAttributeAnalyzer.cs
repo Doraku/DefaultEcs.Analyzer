@@ -3,19 +3,19 @@ using DefaultEcs.Analyzer.Extension;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 
-namespace DefaultEcs.Analyzer
+namespace DefaultEcs.Analyzer.Diagnostics
 {
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    public sealed class ComponentAttributeAnalyser : DiagnosticAnalyzer
+    public sealed class ComponentAttributeAnalyzer : DiagnosticAnalyzer
     {
         public static readonly DiagnosticDescriptor InvalidBaseTypeRule = new DiagnosticDescriptor(
             "DEA0004",
-            "Component attribute used on a type which is not derived from DefaultEcs.System.AEntitySystem or DefaultEcs.System.AEntityBufferedSystem",
-            "Remove '{1}' from the '{0}' type.",
+            "Component attribute used on a type which is not derived from DefaultEcs.System.AEntitySystem, DefaultEcs.System.AEntitiesSystem, DefaultEcs.System.AEntityBufferedSystem or DefaultEcs.System.AEntitiesBufferedSystem",
+            "Remove '{1}' from the '{0}' type",
             DiagnosticCategory.Correctness,
             DiagnosticSeverity.Info,
             true,
-            "Component attribute should only be used on type which is not derived from DefaultEcs.System.AEntitySystem or DefaultEcs.System.AEntityBufferedSystem.");
+            "Component attribute should only be used on type which is derived from DefaultEcs.System.AEntitySystem, DefaultEcs.System.AEntitiesSystem, DefaultEcs.System.AEntityBufferedSystem or DefaultEcs.System.AEntitiesBufferedSystem.");
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(InvalidBaseTypeRule);
 
@@ -34,7 +34,7 @@ namespace DefaultEcs.Analyzer
             {
                 foreach (AttributeData attribute in type.GetComponentAttributes())
                 {
-                    context.ReportDiagnostic(InvalidBaseTypeRule, type.Locations[0], type.Name, attribute.AttributeClass.Name);
+                    context.ReportDiagnostic(Diagnostic.Create(InvalidBaseTypeRule, type.Locations[0], type.Name, attribute.AttributeClass.Name));
                 }
             }
         }

@@ -2,7 +2,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 using TestHelper;
 using Xunit;
 
-namespace DefaultEcs.Analyzer.Test
+namespace DefaultEcs.Analyzer.Diagnostics.Test
 {
     public class WithPredicateAttributeAnalyserTest : DiagnosticVerifier
     {
@@ -54,9 +54,9 @@ namespace DummyNamespace
 
             DiagnosticResult expected = new DiagnosticResult
             {
-                Id = WithPredicateAttributeAnalyser.InvalidSignatureRule.Id,
-                Message = string.Format((string)WithPredicateAttributeAnalyser.InvalidSignatureRule.MessageFormat, "DummyMethod"),
-                Severity = WithPredicateAttributeAnalyser.InvalidSignatureRule.DefaultSeverity,
+                Id = WithPredicateAttributeAnalyzer.InvalidSignatureRule.Id,
+                Message = string.Format((string)WithPredicateAttributeAnalyzer.InvalidSignatureRule.MessageFormat, "DummyMethod"),
+                Severity = WithPredicateAttributeAnalyzer.InvalidSignatureRule.DefaultSeverity,
                 Locations = new[]
                 {
                     new DiagnosticResultLocation("Test0.cs", 9, 14)
@@ -85,9 +85,9 @@ namespace DummyNamespace
 
             DiagnosticResult expected = new DiagnosticResult
             {
-                Id = WithPredicateAttributeAnalyser.InvalidSignatureRule.Id,
-                Message = string.Format((string)WithPredicateAttributeAnalyser.InvalidSignatureRule.MessageFormat, "DummyMethod"),
-                Severity = WithPredicateAttributeAnalyser.InvalidSignatureRule.DefaultSeverity,
+                Id = WithPredicateAttributeAnalyzer.InvalidSignatureRule.Id,
+                Message = string.Format((string)WithPredicateAttributeAnalyzer.InvalidSignatureRule.MessageFormat, "DummyMethod"),
+                Severity = WithPredicateAttributeAnalyzer.InvalidSignatureRule.DefaultSeverity,
                 Locations = new[]
                 {
                     new DiagnosticResultLocation("Test0.cs", 9, 14)
@@ -116,9 +116,9 @@ namespace DummyNamespace
 
             DiagnosticResult expected = new DiagnosticResult
             {
-                Id = WithPredicateAttributeAnalyser.InvalidSignatureRule.Id,
-                Message = string.Format((string)WithPredicateAttributeAnalyser.InvalidSignatureRule.MessageFormat, "DummyMethod"),
-                Severity = WithPredicateAttributeAnalyser.InvalidSignatureRule.DefaultSeverity,
+                Id = WithPredicateAttributeAnalyzer.InvalidSignatureRule.Id,
+                Message = string.Format((string)WithPredicateAttributeAnalyzer.InvalidSignatureRule.MessageFormat, "DummyMethod"),
+                Severity = WithPredicateAttributeAnalyzer.InvalidSignatureRule.DefaultSeverity,
                 Locations = new[]
                 {
                     new DiagnosticResultLocation("Test0.cs", 9, 14)
@@ -148,9 +148,9 @@ namespace DummyNamespace
 
             DiagnosticResult expected = new DiagnosticResult
             {
-                Id = WithPredicateAttributeAnalyser.InvalidBaseTypeRule.Id,
-                Message = string.Format((string)WithPredicateAttributeAnalyser.InvalidBaseTypeRule.MessageFormat, "DummyMethod"),
-                Severity = WithPredicateAttributeAnalyser.InvalidBaseTypeRule.DefaultSeverity,
+                Id = WithPredicateAttributeAnalyzer.InvalidBaseTypeRule.Id,
+                Message = string.Format((string)WithPredicateAttributeAnalyzer.InvalidBaseTypeRule.MessageFormat, "DummyMethod"),
+                Severity = WithPredicateAttributeAnalyzer.InvalidBaseTypeRule.DefaultSeverity,
                 Locations = new[]
                 {
                     new DiagnosticResultLocation("Test0.cs", 9, 14)
@@ -164,7 +164,7 @@ namespace DummyNamespace
 
         #region DiagnosticVerifier
 
-        protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer() => new WithPredicateAttributeAnalyser();
+        protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer() => new WithPredicateAttributeAnalyzer();
 
         #endregion
     }

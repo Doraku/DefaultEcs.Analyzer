@@ -1,4 +1,5 @@
-﻿using System.Collections.Immutable;
+﻿using System.Collections.Generic;
+using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 
 namespace DefaultEcs.Analyzer.Extension
@@ -7,23 +8,64 @@ namespace DefaultEcs.Analyzer.Extension
     {
         private static readonly ImmutableHashSet<string> _entitySystemTypes = ImmutableHashSet.Create(
             "DefaultEcs.System.AEntitySystem<T>",
-            "DefaultEcs.System.AEntityBufferedSystem<T>");
+            "DefaultEcs.System.AEntityBufferedSystem<T>",
+            "DefaultEcs.System.AEntitiesSystem<TState, TKey>",
+            "DefaultEcs.System.AEntitiesBufferedSystem<TState, TKey>");
 
         public static bool IsEntity(this INamedTypeSymbol type) => type?.ToString() == "DefaultEcs.Entity";
 
         public static bool IsEntitySystem(this INamedTypeSymbol type) => !(type is null) && (_entitySystemTypes.Contains(type.ConstructedFrom.ToString()) || type.BaseType.IsEntitySystem());
 
-        public static bool IsAEntitySystem(this INamedTypeSymbol type, out ITypeSymbol stateType)
+        public static bool IsAEntitySystem(this INamedTypeSymbol type, out IList<ITypeSymbol> genericTypes)
         {
-            if (type?.ConstructedFrom.ToString() == "DefaultEcs.System.AEntitySystem<T>")
+            if (type?.ConstructedFrom.ToString() is "DefaultEcs.System.AEntitySystem<T>")
             {
-                stateType = type.TypeArguments[0];
+                genericTypes = type.TypeArguments;
                 return true;
             }
 
-            stateType = null;
+            genericTypes = null;
 
-            return type?.BaseType.IsAEntitySystem(out stateType) == true;
+            return type?.BaseType.IsAEntitySystem(out genericTypes) is true;
+        }
+
+        public static bool IsAEntityBufferedSystem(this INamedTypeSymbol type, out IList<ITypeSymbol> genericTypes)
+        {
+            if (type?.ConstructedFrom.ToString() is "DefaultEcs.System.AEntityBufferedSystem<T>")
+            {
+                genericTypes = type.TypeArguments;
+                return true;
+            }
+
+            genericTypes = null;
+
+            return type?.BaseType.IsAEntityBufferedSystem(out genericTypes) is true;
+        }
+
+        public static bool IsAEntitiesSystem(this INamedTypeSymbol type, out IList<ITypeSymbol> genericTypes)
+        {
+            if (type?.ConstructedFrom.ToString() is "DefaultEcs.System.AEntitiesSystem<TState, TKey>")
+            {
+                genericTypes = type.TypeArguments;
+                return true;
+            }
+
+            genericTypes = null;
+
+            return type?.BaseType.IsAEntitiesSystem(out genericTypes) is true;
+        }
+
+        public static bool IsAEntitiesBufferedSystem(this INamedTypeSymbol type, out IList<ITypeSymbol> genericTypes)
+        {
+            if (type?.ConstructedFrom.ToString() is "DefaultEcs.System.AEntitiesBufferedSystem<TState, TKey>")
+            {
+                genericTypes = type.TypeArguments;
+                return true;
+            }
+
+            genericTypes = null;
+
+            return type?.BaseType.IsAEntitiesBufferedSystem(out genericTypes) is true;
         }
     }
 }

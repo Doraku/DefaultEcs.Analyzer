@@ -2,7 +2,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 using TestHelper;
 using Xunit;
 
-namespace DefaultEcs.Analyzer.Test
+namespace DefaultEcs.Analyzer.Diagnostics.Test
 {
     public class SubscribeAttributeAnalyserTest : DiagnosticVerifier
     {
@@ -49,9 +49,9 @@ namespace DummyNamespace
 
             DiagnosticResult expected = new DiagnosticResult
             {
-                Id = SubscribeAttributeAnalyser.Rule.Id,
-                Message = string.Format((string)SubscribeAttributeAnalyser.Rule.MessageFormat, "DummyMethod"),
-                Severity = SubscribeAttributeAnalyser.Rule.DefaultSeverity,
+                Id = SubscribeAttributeAnalyzer.Rule.Id,
+                Message = string.Format((string)SubscribeAttributeAnalyzer.Rule.MessageFormat, "DummyMethod"),
+                Severity = SubscribeAttributeAnalyzer.Rule.DefaultSeverity,
                 Locations = new[]
                 {
                     new DiagnosticResultLocation("Test0.cs", 9, 14)
@@ -81,9 +81,9 @@ namespace DummyNamespace
 
             DiagnosticResult expected = new DiagnosticResult
             {
-                Id = SubscribeAttributeAnalyser.Rule.Id,
-                Message = string.Format((string)SubscribeAttributeAnalyser.Rule.MessageFormat, "DummyMethod"),
-                Severity = SubscribeAttributeAnalyser.Rule.DefaultSeverity,
+                Id = SubscribeAttributeAnalyzer.Rule.Id,
+                Message = string.Format((string)SubscribeAttributeAnalyzer.Rule.MessageFormat, "DummyMethod"),
+                Severity = SubscribeAttributeAnalyzer.Rule.DefaultSeverity,
                 Locations = new[]
                 {
                     new DiagnosticResultLocation("Test0.cs", 9, 14)
@@ -113,9 +113,9 @@ namespace DummyNamespace
 
             DiagnosticResult expected = new DiagnosticResult
             {
-                Id = SubscribeAttributeAnalyser.Rule.Id,
-                Message = string.Format((string)SubscribeAttributeAnalyser.Rule.MessageFormat, "DummyMethod"),
-                Severity = SubscribeAttributeAnalyser.Rule.DefaultSeverity,
+                Id = SubscribeAttributeAnalyzer.Rule.Id,
+                Message = string.Format((string)SubscribeAttributeAnalyzer.Rule.MessageFormat, "DummyMethod"),
+                Severity = SubscribeAttributeAnalyzer.Rule.DefaultSeverity,
                 Locations = new[]
                 {
                     new DiagnosticResultLocation("Test0.cs", 9, 14)
@@ -129,7 +129,7 @@ namespace DummyNamespace
 
         #region DiagnosticVerifier
 
-        protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer() => new SubscribeAttributeAnalyser();
+        protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer() => new SubscribeAttributeAnalyzer();
 
         #endregion
     }
