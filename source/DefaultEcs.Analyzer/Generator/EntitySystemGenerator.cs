@@ -69,6 +69,7 @@ namespace DefaultEcs.System
                     List<string> components = new();
                     List<string> withAttributes = new();
 
+                    bool isBufferType = false;
                     if (type.IsAEntitySystem(out IList<ITypeSymbol> genericTypes))
                     {
                         updateOverrideParameters.Add($"{genericTypes[0]} state");
@@ -81,11 +82,13 @@ namespace DefaultEcs.System
                     else if (type.IsAEntityBufferedSystem(out genericTypes))
                     {
                         updateOverrideParameters.Add($"{genericTypes[0]} state");
+                        isBufferType = true;
                     }
                     else if (type.IsAEntitiesBufferedSystem(out genericTypes))
                     {
                         updateOverrideParameters.Add($"{genericTypes[0]} state");
                         updateOverrideParameters.Add($"in {genericTypes[1]} key");
+                        isBufferType = true;
                     }
 
                     foreach (IParameterSymbol parameter in method.Parameters)
@@ -115,9 +118,11 @@ namespace DefaultEcs.System
                     List<INamedTypeSymbol> parentTypes = type.GetParentTypes().Skip(1).Reverse().ToList();
 
                     code.AppendLine("using System;");
+                    code.AppendLine("using System.Collections.Generic;");
                     code.AppendLine("using System.Runtime.CompilerServices;");
                     code.AppendLine("using DefaultEcs;");
                     code.AppendLine("using DefaultEcs.System;");
+                    code.AppendLine("using DefaultEcs.Threading;");
                     code.AppendLine();
                     code.Append("namespace ").AppendLine(type.GetNamespace());
                     code.AppendLine("{");
@@ -128,14 +133,40 @@ namespace DefaultEcs.System
                         code.AppendLine("    {");
                     }
 
-                    if (type.Constructors.IsEmpty)
-                    {
-                        code.AppendLine();
-                    }
-
                     code.Append("    [With(").Append(string.Join(", ", withAttributes)).AppendLine(")]");
                     code.Append("    ").Append(type.DeclaredAccessibility.ToCode()).Append(" partial class ").AppendLine(type.Name);
                     code.AppendLine("    {");
+
+                    if (type.Constructors.All(c => c.IsImplicitlyDeclared))
+                    {
+                        if (isBufferType)
+                        {
+                            code.AppendLine("        [CompilerGenerated]");
+                            code.Append("        public ").Append(type.Name).AppendLine("(World world)");
+                            code.AppendLine("            : base(world)");
+                            code.AppendLine("        { }");
+                        }
+                        else
+                        {
+                            code.AppendLine("        [CompilerGenerated]");
+                            code.Append("        public ").Append(type.Name).AppendLine("(World world, IParallelRunner runner, int minEntityCountByRunnerIndex)");
+                            code.AppendLine("            : base(world, runner, minEntityCountByRunnerIndex)");
+                            code.AppendLine("        { }");
+                            code.AppendLine();
+                            code.AppendLine("        [CompilerGenerated]");
+                            code.Append("        public ").Append(type.Name).AppendLine("(World world, IParallelRunner runner)");
+                            code.AppendLine("            : this(world, runner, 0)");
+                            code.AppendLine("        { }");
+                            code.AppendLine();
+                            code.AppendLine("        [CompilerGenerated]");
+                            code.Append("        public ").Append(type.Name).AppendLine("(World world)");
+                            code.AppendLine("            : this(world, null, 0)");
+                            code.AppendLine("        { }");
+                            code.AppendLine();
+                        }
+                        code.AppendLine();
+                    }
+
                     code.AppendLine("        [CompilerGenerated]");
                     code.Append("        protected override void Update(").Append(string.Join(", ", updateOverrideParameters)).AppendLine(", ReadOnlySpan<Entity> entities)");
                     code.AppendLine("        {");

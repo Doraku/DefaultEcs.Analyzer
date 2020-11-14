@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <PropertyGroup Label="Package">
-    <Version>0.2.0-b21</Version>
+    <Version>0.2.0-b23</Version>
     <PackageReleaseNotes>
     </PackageReleaseNotes>
   </PropertyGroup>

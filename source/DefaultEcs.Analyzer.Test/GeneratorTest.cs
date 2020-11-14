@@ -36,10 +36,6 @@ namespace DefaultEcs.Benchmark.DefaultEcs
 
     internal sealed partial class AutoSystem : AEntitySystem<float>
     {
-        public AutoSystem(World world, IParallelRunner runner)
-            : base(world, runner)
-        { }
-
         [Update]
         private void Update(float state, in Speed speed, ref Position position)
         {
