@@ -45,7 +45,7 @@ namespace TestHelper
         {
             get
             {
-                return locations ??= new DiagnosticResultLocation[] { };
+                return locations ??= Array.Empty<DiagnosticResultLocation>();
             }
 
             set

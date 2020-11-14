@@ -3,7 +3,7 @@ using DefaultEcs.Analyzer.Extension;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 
-namespace DefaultEcs.Analyzer.Diagnostics
+namespace DefaultEcs.Analyzer.Suppressors
 {
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class SubscribeAttributeSuppressor : DiagnosticSuppressor

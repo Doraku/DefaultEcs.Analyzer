@@ -6,7 +6,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
-namespace DefaultEcs.Analyzer.Diagnostics
+namespace DefaultEcs.Analyzer.Analyzers
 {
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class EntitySystemAnalyzer : DiagnosticAnalyzer
@@ -20,7 +20,7 @@ namespace DefaultEcs.Analyzer.Diagnostics
             "NotifyChanged",
             "Dispose");
 
-        public static readonly DiagnosticDescriptor EntityModificationRule = new DiagnosticDescriptor(
+        public static readonly DiagnosticDescriptor NoEntityModificationRule = new DiagnosticDescriptor(
             "DEA0005",
             "Entity modification method '{0}' used inside the Update method of AEntitySystem or AEntitiesSystem",
             "Use an EntityCommandRecorder or change the system to an AEntityBufferedSystem or AEntitiesBufferedSystem",
@@ -29,7 +29,7 @@ namespace DefaultEcs.Analyzer.Diagnostics
             true,
             "Entity modification methods are not thread safe and should not be used inside the Update method of AEntitySystem or AEntitiesSystem.");
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(EntityModificationRule);
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(NoEntityModificationRule);
 
         public override void Initialize(AnalysisContext context)
         {
@@ -49,7 +49,7 @@ namespace DefaultEcs.Analyzer.Diagnostics
                     IMethodSymbol invokedMethod = context.Operation.SemanticModel.GetSymbolInfo(invocation.Expression).As<IMethodSymbol>();
                     if (invokedMethod?.ContainingType.IsEntity() is true && _entityChangeMethods.Contains(invokedMethod.Name))
                     {
-                        context.ReportDiagnostic(Diagnostic.Create(EntityModificationRule, invocation.GetLocation(), invokedMethod.Name));
+                        context.ReportDiagnostic(Diagnostic.Create(NoEntityModificationRule, invocation.GetLocation(), invokedMethod.Name));
                     }
                 }
             }

@@ -1,8 +1,9 @@
-﻿using Microsoft.CodeAnalysis.Diagnostics;
+﻿using DefaultEcs.Analyzer.Analyzers;
+using Microsoft.CodeAnalysis.Diagnostics;
 using TestHelper;
 using Xunit;
 
-namespace DefaultEcs.Analyzer.Diagnostics.Test
+namespace DefaultEcs.Analyzer.Test.Analyzers
 {
     public class EntitySystemAnalyzerTest : DiagnosticVerifier
     {
@@ -71,65 +72,65 @@ namespace DummyNamespace
                 code,
                 new DiagnosticResult
                 {
-                    Id = EntitySystemAnalyzer.EntityModificationRule.Id,
-                    Message = string.Format((string)EntitySystemAnalyzer.EntityModificationRule.MessageFormat, "Set"),
-                    Severity = EntitySystemAnalyzer.EntityModificationRule.DefaultSeverity,
+                    Id = EntitySystemAnalyzer.NoEntityModificationRule.Id,
+                    Message = string.Format((string)EntitySystemAnalyzer.NoEntityModificationRule.MessageFormat, "Set"),
+                    Severity = EntitySystemAnalyzer.NoEntityModificationRule.DefaultSeverity,
                     Locations = new[] { new DiagnosticResultLocation("Test0.cs", 15, 13) }
                 },
                 new DiagnosticResult
                 {
-                    Id = EntitySystemAnalyzer.EntityModificationRule.Id,
-                    Message = string.Format((string)EntitySystemAnalyzer.EntityModificationRule.MessageFormat, "SetSameAs"),
-                    Severity = EntitySystemAnalyzer.EntityModificationRule.DefaultSeverity,
+                    Id = EntitySystemAnalyzer.NoEntityModificationRule.Id,
+                    Message = string.Format((string)EntitySystemAnalyzer.NoEntityModificationRule.MessageFormat, "SetSameAs"),
+                    Severity = EntitySystemAnalyzer.NoEntityModificationRule.DefaultSeverity,
                     Locations = new[] { new DiagnosticResultLocation("Test0.cs", 16, 13) }
                 },
                 new DiagnosticResult
                 {
-                    Id = EntitySystemAnalyzer.EntityModificationRule.Id,
-                    Message = string.Format((string)EntitySystemAnalyzer.EntityModificationRule.MessageFormat, "NotifyChanged"),
-                    Severity = EntitySystemAnalyzer.EntityModificationRule.DefaultSeverity,
+                    Id = EntitySystemAnalyzer.NoEntityModificationRule.Id,
+                    Message = string.Format((string)EntitySystemAnalyzer.NoEntityModificationRule.MessageFormat, "NotifyChanged"),
+                    Severity = EntitySystemAnalyzer.NoEntityModificationRule.DefaultSeverity,
                     Locations = new[] { new DiagnosticResultLocation("Test0.cs", 17, 13) }
                 },
                 new DiagnosticResult
                 {
-                    Id = EntitySystemAnalyzer.EntityModificationRule.Id,
-                    Message = string.Format((string)EntitySystemAnalyzer.EntityModificationRule.MessageFormat, "Disable"),
-                    Severity = EntitySystemAnalyzer.EntityModificationRule.DefaultSeverity,
+                    Id = EntitySystemAnalyzer.NoEntityModificationRule.Id,
+                    Message = string.Format((string)EntitySystemAnalyzer.NoEntityModificationRule.MessageFormat, "Disable"),
+                    Severity = EntitySystemAnalyzer.NoEntityModificationRule.DefaultSeverity,
                     Locations = new[] { new DiagnosticResultLocation("Test0.cs", 18, 13) }
                 },
                 new DiagnosticResult
                 {
-                    Id = EntitySystemAnalyzer.EntityModificationRule.Id,
-                    Message = string.Format((string)EntitySystemAnalyzer.EntityModificationRule.MessageFormat, "Enable"),
-                    Severity = EntitySystemAnalyzer.EntityModificationRule.DefaultSeverity,
+                    Id = EntitySystemAnalyzer.NoEntityModificationRule.Id,
+                    Message = string.Format((string)EntitySystemAnalyzer.NoEntityModificationRule.MessageFormat, "Enable"),
+                    Severity = EntitySystemAnalyzer.NoEntityModificationRule.DefaultSeverity,
                     Locations = new[] { new DiagnosticResultLocation("Test0.cs", 19, 13) }
                 },
                 new DiagnosticResult
                 {
-                    Id = EntitySystemAnalyzer.EntityModificationRule.Id,
-                    Message = string.Format((string)EntitySystemAnalyzer.EntityModificationRule.MessageFormat, "Disable"),
-                    Severity = EntitySystemAnalyzer.EntityModificationRule.DefaultSeverity,
+                    Id = EntitySystemAnalyzer.NoEntityModificationRule.Id,
+                    Message = string.Format((string)EntitySystemAnalyzer.NoEntityModificationRule.MessageFormat, "Disable"),
+                    Severity = EntitySystemAnalyzer.NoEntityModificationRule.DefaultSeverity,
                     Locations = new[] { new DiagnosticResultLocation("Test0.cs", 20, 13) }
                 },
                 new DiagnosticResult
                 {
-                    Id = EntitySystemAnalyzer.EntityModificationRule.Id,
-                    Message = string.Format((string)EntitySystemAnalyzer.EntityModificationRule.MessageFormat, "Enable"),
-                    Severity = EntitySystemAnalyzer.EntityModificationRule.DefaultSeverity,
+                    Id = EntitySystemAnalyzer.NoEntityModificationRule.Id,
+                    Message = string.Format((string)EntitySystemAnalyzer.NoEntityModificationRule.MessageFormat, "Enable"),
+                    Severity = EntitySystemAnalyzer.NoEntityModificationRule.DefaultSeverity,
                     Locations = new[] { new DiagnosticResultLocation("Test0.cs", 21, 13) }
                 },
                 new DiagnosticResult
                 {
-                    Id = EntitySystemAnalyzer.EntityModificationRule.Id,
-                    Message = string.Format((string)EntitySystemAnalyzer.EntityModificationRule.MessageFormat, "Remove"),
-                    Severity = EntitySystemAnalyzer.EntityModificationRule.DefaultSeverity,
+                    Id = EntitySystemAnalyzer.NoEntityModificationRule.Id,
+                    Message = string.Format((string)EntitySystemAnalyzer.NoEntityModificationRule.MessageFormat, "Remove"),
+                    Severity = EntitySystemAnalyzer.NoEntityModificationRule.DefaultSeverity,
                     Locations = new[] { new DiagnosticResultLocation("Test0.cs", 22, 13) }
                 },
                 new DiagnosticResult
                 {
-                    Id = EntitySystemAnalyzer.EntityModificationRule.Id,
-                    Message = string.Format((string)EntitySystemAnalyzer.EntityModificationRule.MessageFormat, "Dispose"),
-                    Severity = EntitySystemAnalyzer.EntityModificationRule.DefaultSeverity,
+                    Id = EntitySystemAnalyzer.NoEntityModificationRule.Id,
+                    Message = string.Format((string)EntitySystemAnalyzer.NoEntityModificationRule.MessageFormat, "Dispose"),
+                    Severity = EntitySystemAnalyzer.NoEntityModificationRule.DefaultSeverity,
                     Locations = new[] { new DiagnosticResultLocation("Test0.cs", 23, 13) }
                 });
         }
@@ -170,65 +171,65 @@ namespace DummyNamespace
                 code,
                 new DiagnosticResult
                 {
-                    Id = EntitySystemAnalyzer.EntityModificationRule.Id,
-                    Message = string.Format((string)EntitySystemAnalyzer.EntityModificationRule.MessageFormat, "Set"),
-                    Severity = EntitySystemAnalyzer.EntityModificationRule.DefaultSeverity,
+                    Id = EntitySystemAnalyzer.NoEntityModificationRule.Id,
+                    Message = string.Format((string)EntitySystemAnalyzer.NoEntityModificationRule.MessageFormat, "Set"),
+                    Severity = EntitySystemAnalyzer.NoEntityModificationRule.DefaultSeverity,
                     Locations = new[] { new DiagnosticResultLocation("Test0.cs", 15, 13) }
                 },
                 new DiagnosticResult
                 {
-                    Id = EntitySystemAnalyzer.EntityModificationRule.Id,
-                    Message = string.Format((string)EntitySystemAnalyzer.EntityModificationRule.MessageFormat, "SetSameAs"),
-                    Severity = EntitySystemAnalyzer.EntityModificationRule.DefaultSeverity,
+                    Id = EntitySystemAnalyzer.NoEntityModificationRule.Id,
+                    Message = string.Format((string)EntitySystemAnalyzer.NoEntityModificationRule.MessageFormat, "SetSameAs"),
+                    Severity = EntitySystemAnalyzer.NoEntityModificationRule.DefaultSeverity,
                     Locations = new[] { new DiagnosticResultLocation("Test0.cs", 16, 13) }
                 },
                 new DiagnosticResult
                 {
-                    Id = EntitySystemAnalyzer.EntityModificationRule.Id,
-                    Message = string.Format((string)EntitySystemAnalyzer.EntityModificationRule.MessageFormat, "NotifyChanged"),
-                    Severity = EntitySystemAnalyzer.EntityModificationRule.DefaultSeverity,
+                    Id = EntitySystemAnalyzer.NoEntityModificationRule.Id,
+                    Message = string.Format((string)EntitySystemAnalyzer.NoEntityModificationRule.MessageFormat, "NotifyChanged"),
+                    Severity = EntitySystemAnalyzer.NoEntityModificationRule.DefaultSeverity,
                     Locations = new[] { new DiagnosticResultLocation("Test0.cs", 17, 13) }
                 },
                 new DiagnosticResult
                 {
-                    Id = EntitySystemAnalyzer.EntityModificationRule.Id,
-                    Message = string.Format((string)EntitySystemAnalyzer.EntityModificationRule.MessageFormat, "Disable"),
-                    Severity = EntitySystemAnalyzer.EntityModificationRule.DefaultSeverity,
+                    Id = EntitySystemAnalyzer.NoEntityModificationRule.Id,
+                    Message = string.Format((string)EntitySystemAnalyzer.NoEntityModificationRule.MessageFormat, "Disable"),
+                    Severity = EntitySystemAnalyzer.NoEntityModificationRule.DefaultSeverity,
                     Locations = new[] { new DiagnosticResultLocation("Test0.cs", 18, 13) }
                 },
                 new DiagnosticResult
                 {
-                    Id = EntitySystemAnalyzer.EntityModificationRule.Id,
-                    Message = string.Format((string)EntitySystemAnalyzer.EntityModificationRule.MessageFormat, "Enable"),
-                    Severity = EntitySystemAnalyzer.EntityModificationRule.DefaultSeverity,
+                    Id = EntitySystemAnalyzer.NoEntityModificationRule.Id,
+                    Message = string.Format((string)EntitySystemAnalyzer.NoEntityModificationRule.MessageFormat, "Enable"),
+                    Severity = EntitySystemAnalyzer.NoEntityModificationRule.DefaultSeverity,
                     Locations = new[] { new DiagnosticResultLocation("Test0.cs", 19, 13) }
                 },
                 new DiagnosticResult
                 {
-                    Id = EntitySystemAnalyzer.EntityModificationRule.Id,
-                    Message = string.Format((string)EntitySystemAnalyzer.EntityModificationRule.MessageFormat, "Disable"),
-                    Severity = EntitySystemAnalyzer.EntityModificationRule.DefaultSeverity,
+                    Id = EntitySystemAnalyzer.NoEntityModificationRule.Id,
+                    Message = string.Format((string)EntitySystemAnalyzer.NoEntityModificationRule.MessageFormat, "Disable"),
+                    Severity = EntitySystemAnalyzer.NoEntityModificationRule.DefaultSeverity,
                     Locations = new[] { new DiagnosticResultLocation("Test0.cs", 20, 13) }
                 },
                 new DiagnosticResult
                 {
-                    Id = EntitySystemAnalyzer.EntityModificationRule.Id,
-                    Message = string.Format((string)EntitySystemAnalyzer.EntityModificationRule.MessageFormat, "Enable"),
-                    Severity = EntitySystemAnalyzer.EntityModificationRule.DefaultSeverity,
+                    Id = EntitySystemAnalyzer.NoEntityModificationRule.Id,
+                    Message = string.Format((string)EntitySystemAnalyzer.NoEntityModificationRule.MessageFormat, "Enable"),
+                    Severity = EntitySystemAnalyzer.NoEntityModificationRule.DefaultSeverity,
                     Locations = new[] { new DiagnosticResultLocation("Test0.cs", 21, 13) }
                 },
                 new DiagnosticResult
                 {
-                    Id = EntitySystemAnalyzer.EntityModificationRule.Id,
-                    Message = string.Format((string)EntitySystemAnalyzer.EntityModificationRule.MessageFormat, "Remove"),
-                    Severity = EntitySystemAnalyzer.EntityModificationRule.DefaultSeverity,
+                    Id = EntitySystemAnalyzer.NoEntityModificationRule.Id,
+                    Message = string.Format((string)EntitySystemAnalyzer.NoEntityModificationRule.MessageFormat, "Remove"),
+                    Severity = EntitySystemAnalyzer.NoEntityModificationRule.DefaultSeverity,
                     Locations = new[] { new DiagnosticResultLocation("Test0.cs", 22, 13) }
                 },
                 new DiagnosticResult
                 {
-                    Id = EntitySystemAnalyzer.EntityModificationRule.Id,
-                    Message = string.Format((string)EntitySystemAnalyzer.EntityModificationRule.MessageFormat, "Dispose"),
-                    Severity = EntitySystemAnalyzer.EntityModificationRule.DefaultSeverity,
+                    Id = EntitySystemAnalyzer.NoEntityModificationRule.Id,
+                    Message = string.Format((string)EntitySystemAnalyzer.NoEntityModificationRule.MessageFormat, "Dispose"),
+                    Severity = EntitySystemAnalyzer.NoEntityModificationRule.DefaultSeverity,
                     Locations = new[] { new DiagnosticResultLocation("Test0.cs", 23, 13) }
                 });
         }

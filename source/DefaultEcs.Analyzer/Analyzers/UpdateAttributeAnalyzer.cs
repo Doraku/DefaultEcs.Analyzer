@@ -4,7 +4,7 @@ using DefaultEcs.Analyzer.Extension;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 
-namespace DefaultEcs.Analyzer.Diagnostics
+namespace DefaultEcs.Analyzer.Analyzers
 {
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class UpdateAttributeAnalyzer : DiagnosticAnalyzer

@@ -130,8 +130,6 @@ namespace DefaultEcs.System
 
                     if (type.Constructors.IsEmpty)
                     {
-
-
                         code.AppendLine();
                     }
 

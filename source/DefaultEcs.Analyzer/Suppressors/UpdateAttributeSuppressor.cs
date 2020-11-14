@@ -4,7 +4,7 @@ using DefaultEcs.Analyzer.Extension;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 
-namespace DefaultEcs.Analyzer.Diagnostics
+namespace DefaultEcs.Analyzer.Suppressors
 {
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class UpdateAttributeSuppressor : DiagnosticSuppressor
@@ -19,11 +19,6 @@ namespace DefaultEcs.Analyzer.Diagnostics
             "IDE0051",
             "Partial class generated.");
 
-        public static readonly SuppressionDescriptor ReadOnlyRule = new SuppressionDescriptor(
-            "DES0007",
-            "RCS1242",
-            "More expressive.");
-
         public override ImmutableArray<SuppressionDescriptor> SupportedSuppressions => ImmutableArray.Create(PartialRule, UnusedRule);
 
         public override void ReportSuppressions(SuppressionAnalysisContext context)
@@ -37,7 +32,6 @@ namespace DefaultEcs.Analyzer.Diagnostics
                 else if (context.TryGetMethodSymbol(diagnostic, out IMethodSymbol method) && method.HasUpdateAttribute())
                 {
                     context.ReportSuppression(diagnostic, UnusedRule);
-                    context.ReportSuppression(diagnostic, ReadOnlyRule);
                 }
             }
         }
