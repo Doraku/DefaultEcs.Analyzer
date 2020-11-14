@@ -17,6 +17,7 @@ namespace DefaultEcs.Analyzer.Test
             const string source = @"
 using System;
 using System.Linq;
+using DefaultEcs;
 using DefaultEcs.System;
 using DefaultEcs.Threading;
 
@@ -37,7 +38,7 @@ namespace DefaultEcs.Benchmark.DefaultEcs
     internal sealed partial class AutoSystem : AEntitySystem<float>
     {
         [Update]
-        private void Update(float state, in Speed speed, ref Position position)
+        private void Update(float state, in Speed speed, in Components<int> ints, ref Position position)
         {
             position.X += speed.X * state;
             position.Y += speed.Y * state;

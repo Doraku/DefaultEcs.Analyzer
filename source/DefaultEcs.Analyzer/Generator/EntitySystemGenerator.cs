@@ -105,6 +105,13 @@ namespace DefaultEcs.System
                         {
                             parameters.Add("key");
                         }
+                        else if (parameter.Type.IsComponents() && parameter.Type is INamedTypeSymbol componentType)
+                        {
+                            string name = $"components{components.Count}";
+
+                            components.Add($"            {parameter.Type} {name} = World.GetComponents<global::{componentType.TypeArguments[0]}>();");
+                            parameters.Add((parameter.RefKind == RefKind.Ref ? "ref " : string.Empty) + name);
+                        }
                         else
                         {
                             string name = $"components{components.Count}";
