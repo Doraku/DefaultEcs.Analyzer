@@ -14,29 +14,37 @@ namespace DefaultEcs.Analyzer.Test
         [Fact]
         public void Check()
         {
-            string source = @"
-using EnumValidation;
-namespace Foo
+            const string source = @"
+using System;
+using System.Linq;
+using DefaultEcs.System;
+using DefaultEcs.Threading;
+
+namespace DefaultEcs.Benchmark.DefaultEcs
 {
- enum Simple
+    internal struct Position
     {
-        First,
-        Second
+        public float X;
+        public float Y;
     }
-    enum Complex
+
+    internal struct Speed
     {
-        First = 3,
-        Second = 4,
-        Third = 7,
-        Fourth = 8,
-        Fifth = 9
+        public float X;
+        public float Y;
     }
-    class C
+
+    internal sealed partial class AutoSystem : AEntitySystem<float>
     {
-        void M(Simple simp, Complex comp)
+        public AutoSystem(World world, IParallelRunner runner)
+            : base(world, runner)
+        { }
+
+        [Update]
+        private void Update(float state, in Speed speed, ref Position position)
         {
-            EnumValidator.Validate(simp);
-            EnumValidator.Validate(comp);
+            position.X += speed.X * state;
+            position.Y += speed.Y * state;
         }
     }
 }";

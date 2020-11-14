@@ -20,10 +20,6 @@ namespace DefaultEcs.Analyzer.Diagnostics
             "NotifyChanged",
             "Dispose");
 
-        private static readonly ImmutableHashSet<string> _updateParameters = ImmutableHashSet.Create(
-            "DefaultEcs.Entity",
-            "System.ReadOnlySpan<DefaultEcs.Entity>");
-
         public static readonly DiagnosticDescriptor EntityModificationRule = new DiagnosticDescriptor(
             "DEA0005",
             "Entity modification method '{0}' used inside the Update method of AEntitySystem or AEntitiesSystem",
@@ -46,13 +42,7 @@ namespace DefaultEcs.Analyzer.Diagnostics
         {
             if (context.ContainingSymbol is IMethodSymbol method
                 && (method.ContainingType.IsAEntitySystem(out IList<ITypeSymbol> genericTypes) || method.ContainingType.IsAEntitiesSystem(out genericTypes))
-                && (method.HasUpdateAttribute()
-                    || (method.IsOverride
-                        && method.Name == "Update"
-                        && method.ReturnsVoid
-                        && method.Parameters.Length == genericTypes.Count + 1
-                        && genericTypes.Select((p, i) => SymbolEqualityComparer.Default.Equals(method.Parameters[i].Type, p)).All(b => b is true)
-                        && _updateParameters.Contains(method.Parameters[genericTypes.Count].Type.ToString()))))
+                && (method.HasUpdateAttribute() || method.IsEntitySystemUpdateOverride(genericTypes)))
             {
                 foreach (InvocationExpressionSyntax invocation in method.DeclaringSyntaxReferences.SelectMany(r => r.GetSyntax().DescendantNodes().OfType<InvocationExpressionSyntax>()))
                 {

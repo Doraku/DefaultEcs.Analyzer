@@ -1,5 +1,5 @@
-using Microsoft.CodeAnalysis;
 using System;
+using Microsoft.CodeAnalysis;
 
 namespace TestHelper
 {
@@ -24,6 +24,10 @@ namespace TestHelper
             this.Line = line;
             this.Column = column;
         }
+
+        public DiagnosticResultLocation(int line, int column)
+            : this("Test0.cs", line, column)
+        { }
 
         public string Path { get; }
         public int Line { get; }
@@ -78,6 +82,15 @@ namespace TestHelper
             {
                 return this.Locations.Length > 0 ? this.Locations[0].Column : -1;
             }
+        }
+
+        public DiagnosticResult(DiagnosticResultLocation location, DiagnosticDescriptor description, params object[] args)
+        {
+            Id = description.Id;
+            Severity = description.DefaultSeverity;
+            Message = string.Format((string)description.MessageFormat, args);
+
+            locations = new[] { location };
         }
     }
 }

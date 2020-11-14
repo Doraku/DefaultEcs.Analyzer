@@ -30,5 +30,21 @@ namespace DefaultEcs.Analyzer.Extension
         public static bool HasWithPredicateAttribute(this ISymbol symbol) => symbol.GetAttributes().Any(a => a.ToString() == "DefaultEcs.System.WithPredicateAttribute");
 
         public static bool HasUpdateAttribute(this ISymbol symbol) => symbol.GetAttributes().Any(a => a.ToString() == "DefaultEcs.System.UpdateAttribute");
+
+        public static bool HasCompilerGeneratedAttribute(this ISymbol symbol) => symbol.GetAttributes().Any(a => a.ToString() == "System.Runtime.CompilerServices.CompilerGeneratedAttribute");
+
+        public static string GetNamespace(this ISymbol symbol)
+        {
+            INamespaceSymbol namespaceSymbol = symbol.ContainingNamespace;
+            string value = string.Empty;
+
+            while (namespaceSymbol?.IsGlobalNamespace is false)
+            {
+                value = namespaceSymbol.Name + (string.IsNullOrEmpty(value) ? value : ('.' + value));
+                namespaceSymbol = namespaceSymbol.ContainingNamespace;
+            }
+
+            return value;
+        }
     }
 }

@@ -6,6 +6,19 @@ namespace DefaultEcs.Analyzer.Extension
 {
     internal static class SuppressionAnalysisContextExtension
     {
+        public static bool TryGetTypeSymbol(this SuppressionAnalysisContext context, Diagnostic diagnostic, out ITypeSymbol typeSymbol)
+        {
+            SyntaxNode syntaxNode = diagnostic.Location.SourceTree.GetRoot(context.CancellationToken).FindNode(diagnostic.Location.SourceSpan) switch
+            {
+                TypeDeclarationSyntax type => type,
+                _ => default
+            };
+
+            typeSymbol = syntaxNode is null ? null : context.GetSemanticModel(diagnostic.Location.SourceTree).GetDeclaredSymbol(syntaxNode) as ITypeSymbol;
+
+            return typeSymbol != null;
+        }
+
         public static bool TryGetMethodSymbol(this SuppressionAnalysisContext context, Diagnostic diagnostic, out IMethodSymbol methodSymbol)
         {
             SyntaxNode syntaxNode = diagnostic.Location.SourceTree.GetRoot(context.CancellationToken).FindNode(diagnostic.Location.SourceSpan) switch

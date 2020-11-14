@@ -4,8 +4,14 @@
 ### New Rules
 Rule ID | Category | Severity | Notes
 --------|----------|----------|-------
-DEA0001 | RuntimeError | Error | SubscribeAttributeAnalyser
-DEA0002 | RuntimeError | Error | WithPredicateAttributeAnalyser
-DEA0003 | Correctness | Info | WithPredicateAttributeAnalyser
-DEA0004 | Correctness | Info | ComponentAttributeAnalyser
-DEA0005 | RuntimeError | Warning | AEntitySystemAnalyser
+DEA0001 | RuntimeError | Error | SubscribeAttributeAnalyzer
+DEA0002 | RuntimeError | Error | WithPredicateAttributeAnalyzer
+DEA0003 | Correctness | Info | WithPredicateAttributeAnalyzer
+DEA0004 | Correctness | Info | ComponentAttributeAnalyzer
+DEA0005 | RuntimeError | Warning | EntitySystemAnalyzer
+DEA0006 | Correctness | Warning | UpdateAttributeAnalyzer
+DEA0007 | Correctness | Error | UpdateAttributeAnalyzer
+DEA0008 | Correctness | Error | UpdateAttributeAnalyzer
+DEA0009 | Correctness | Error | UpdateAttributeAnalyzer
+DEA0010 | Correctness | Error | UpdateAttributeAnalyzer
+DEA0011 | Correctness | Warning | UpdateAttributeAnalyzer

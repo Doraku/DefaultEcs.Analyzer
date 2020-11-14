@@ -12,8 +12,6 @@ namespace DefaultEcs.Analyzer.Extension
             "DefaultEcs.System.AEntitiesSystem<TState, TKey>",
             "DefaultEcs.System.AEntitiesBufferedSystem<TState, TKey>");
 
-        public static bool IsEntity(this INamedTypeSymbol type) => type?.ToString() == "DefaultEcs.Entity";
-
         public static bool IsEntitySystem(this INamedTypeSymbol type) => !(type is null) && (_entitySystemTypes.Contains(type.ConstructedFrom.ToString()) || type.BaseType.IsEntitySystem());
 
         public static bool IsAEntitySystem(this INamedTypeSymbol type, out IList<ITypeSymbol> genericTypes)
@@ -66,6 +64,15 @@ namespace DefaultEcs.Analyzer.Extension
             genericTypes = null;
 
             return type?.BaseType.IsAEntitiesBufferedSystem(out genericTypes) is true;
+        }
+
+        public static IEnumerable<INamedTypeSymbol> GetParentTypes(this INamedTypeSymbol type)
+        {
+            while (type != null)
+            {
+                yield return type;
+                type = type.ContainingType;
+            }
         }
     }
 }
