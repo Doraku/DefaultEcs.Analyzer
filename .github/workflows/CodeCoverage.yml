@@ -21,7 +21,7 @@ jobs:
         dotnet-version: '5.0.100'
 
     - name: Build
-      run: dotnet build source\DefaultEcs.Analyzer.Test\DefaultEcs.Analyzer.Test.csproj -c Release
+      run: dotnet build source\DefaultEcs.Analyzer.Test\DefaultEcs.Analyzer.Test.csproj -c Release /p:TEST=true
 
     - name: Install coverlet tool
       run: dotnet tool install --tool-path . --version 1.7.2 coverlet.console

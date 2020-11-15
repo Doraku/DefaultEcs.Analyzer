@@ -19,4 +19,4 @@ jobs:
         dotnet-version: '5.0.100'
         
     - name: Run tests
-      run: dotnet test source\DefaultEcs.Analyzer.Test\DefaultEcs.Analyzer.Test.csproj -c Release
+      run: dotnet test source\DefaultEcs.Analyzer.Test\DefaultEcs.Analyzer.Test.csproj -c Release /p:TEST=true

@@ -48,7 +48,7 @@
     <Version>0-local$([System.DateTime]::UtcNow.ToString("yyyyMMddHHmmss"))</Version>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
+  <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true' AND '$(TEST)' != 'true'">
     <SignAssembly>True</SignAssembly>
     <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
     <AssemblyOriginatorKeyFile>..\..\ds.snk</AssemblyOriginatorKeyFile>

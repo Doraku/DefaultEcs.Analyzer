@@ -23,7 +23,7 @@ jobs:
         NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
     - name: Run tests
-      run: dotnet test source\DefaultEcs.Analyzer.Test\DefaultEcs.Analyzer.Test.csproj -c Release
+      run: dotnet test source\DefaultEcs.Analyzer.Test\DefaultEcs.Analyzer.Test.csproj -c Release /p:TEST=true
       
     - name: Decrypte snk file
       run: gpg --quiet --batch --yes --decrypt --passphrase="$SNK_KEY" --output ds.snk ds.snk.gpg
