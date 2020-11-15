@@ -14,11 +14,6 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v2
-      
-    - name: Decrypte snk file
-      env:
-        SNK_KEY: ${{ secrets.SNK_KEY }}
-      run: gpg --quiet --batch --yes --decrypt --passphrase="$SNK_KEY" --output ds.snk ds.snk.gpg
 
     - name: Set up dotnet
       uses: actions/setup-dotnet@v1
@@ -30,6 +25,11 @@ jobs:
 
     - name: Run tests
       run: dotnet test source\DefaultEcs.Analyzer.Test\DefaultEcs.Analyzer.Test.csproj -c Release /p:TEST=true
+      
+    - name: Decrypte snk file
+      env:
+        SNK_KEY: ${{ secrets.SNK_KEY }}
+      run: gpg --quiet --batch --yes --decrypt --passphrase="$env:SNK_KEY" --output ds.snk ds.snk.gpg
 
     - name: Create package
       run: dotnet pack source\DefaultEcs.Analyzer\DefaultEcs.Analyzer.csproj -c Release -o package /p:CI_VERSION=true
