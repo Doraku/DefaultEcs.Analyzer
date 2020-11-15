@@ -1,0 +1,1 @@
+added code generation for entity system with Update attribute

@@ -1,0 +1,37 @@
+name: continuous integration
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'source/DefaultEcs.Analyzer/**'
+
+jobs:
+  continuous_integration:
+    runs-on: windows-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Set up dotnet
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '5.0.100'
+        source-url: https://nuget.pkg.github.com/Doraku/index.json
+      env:
+        NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
+    - name: Run tests
+      run: dotnet test source\DefaultEcs.Analyzer.Test\DefaultEcs.Analyzer.Test.csproj -c Release
+      
+    - name: Decrypte snk file
+      run: gpg --quiet --batch --yes --decrypt --passphrase="$SNK_KEY" --output ds.snk ds.snk.gpg
+      env:
+        SNK_KEY: ${{ secrets.SNK_KEY }}
+
+    - name: Create package
+      run: dotnet pack source\DefaultEcs.Analyzer\DefaultEcs.Analyzer.csproj -c Release -o package /p:CI_VERSION=true
+
+    - name: Publish package
+      run: nuget push package\*.nupkg

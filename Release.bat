@@ -8,9 +8,6 @@ dotnet test source\DefaultEcs.Analyzer.Test\DefaultEcs.Analyzer.Test.csproj -c R
 
 IF %ERRORLEVEL% GTR 0 GOTO :end
 
-dotnet clean source\DefaultEcs.Analyzer\DefaultEcs.Analyzer.csproj -c Release
-dotnet clean source\DefaultEcs.Analyzer\DefaultEcs.Analyzer.Release.csproj -c Release
-
-dotnet pack source\DefaultEcs.Analyzer\DefaultEcs.Analyzer.Release.csproj -c Release -o package
+dotnet pack source\DefaultEcs.Analyzer\DefaultEcs.Analyzer.csproj -c Release -o package /p:LOCAL_VERSION=true
 
 :end

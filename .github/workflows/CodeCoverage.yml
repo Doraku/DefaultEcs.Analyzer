@@ -1,0 +1,35 @@
+name: code coverage
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'source/DefaultEcs.Analyzer/**'
+      - 'source/DefaultEcs.Analyzer.Test/**'
+
+jobs:
+  code_coverage:
+    runs-on: windows-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Set up dotnet
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '5.0.100'
+
+    - name: Build
+      run: dotnet build source\DefaultEcs.Analyzer.Test\DefaultEcs.Analyzer.Test.csproj -c Release
+
+    - name: Install coverlet tool
+      run: dotnet tool install --tool-path . --version 1.7.2 coverlet.console
+
+    - name: Create coverage file
+      run: dotnet .store\coverlet.console\1.7.2\coverlet.console\1.7.2\tools\netcoreapp2.2\any\coverlet.console.dll source\DefaultEcs.Analyzer.Test\bin\Release\net5.0\DefaultEcs.Analyzer.Test.dll -t "dotnet" -a "vstest source\DefaultEcs.Analyzer.Test\bin\Release\net5.0\DefaultEcs.Analyzer.Test.dll" -o coverage\lcov.info -f lcov
+
+    - name: Upload to coverall
+      uses: coverallsapp/github-action@master
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}

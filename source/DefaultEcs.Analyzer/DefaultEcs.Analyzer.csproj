@@ -1,8 +1,66 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="DefaultEcs.Analyzer.targets" />
+  <PropertyGroup Label="Compilation">
+    <LangVersion>latest</LangVersion>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Optimize>true</Optimize>
+  </PropertyGroup>
 
   <PropertyGroup Label="Debug" Condition="'$(Configuration)'=='Debug'">
     <Optimize>false</Optimize>
     <DefineConstants>DEBUG</DefineConstants>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="DefaultEcs.Analyzer.targets" />
+    <None Include="..\..\image\logo.png" Pack="true" PackagePath="\" Visible="false"/>
+    <None Update="tools\*.ps1" CopyToOutputDirectory="Always" Pack="true" PackagePath="tools" />
+    <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+  </ItemGroup>
+
+  <ItemGroup Label="Reference">
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.1" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.8.0" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All"/>
+  </ItemGroup>
+
+  <PropertyGroup Label="Package">
+    <Authors>Paillat Laszlo</Authors>
+    <AssemblyName>DefaultEcs.Analyzer</AssemblyName>
+    <AssemblyTitle>DefaultEcs.Analyzer</AssemblyTitle>
+    <PackageId>DefaultEcs.Analyzer</PackageId>
+    <Description>Roslyn analyzers for DefaultEcs users.</Description>
+    <PackageIcon>logo.png</PackageIcon>
+    <PackageProjectUrl>https://github.com/Doraku/DefaultEcs.Analyzer</PackageProjectUrl>
+    <PackageLicenseExpression>MIT-0</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/Doraku/DefaultEcs.Analyzer.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>gamedev game-development game-engine ecs entity-component-system</PackageTags>
+
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+    <DevelopmentDependency>true</DevelopmentDependency>
+    <NoPackageAnalysis>true</NoPackageAnalysis>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(LOCAL_VERSION)' == 'true'">
+    <SignAssembly>True</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\..\..\ds.snk</AssemblyOriginatorKeyFile>
+    <Version>0-local$([System.DateTime]::UtcNow.ToString("yyyyMMddHHmmss"))</Version>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
+    <SignAssembly>True</SignAssembly>
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+    <AssemblyOriginatorKeyFile>..\..\ds.snk</AssemblyOriginatorKeyFile>
+    <Version Condition="'$(CI_VERSION)' == 'true'">0-ci$([System.DateTime]::UtcNow.ToString("yyyyMMddHHmmss"))</Version>
+  </PropertyGroup>
+
+  <Target Name="PreparePackageReleaseNotesFromFile" BeforeTargets="GenerateNuspec">
+    <ReadLinesFromFile File="../../documentation/NEXT_RELEASENOTES.txt" >
+      <Output TaskParameter="Lines" ItemName="ReleaseNotesLines"/>
+    </ReadLinesFromFile>
+    <PropertyGroup>
+      <PackageReleaseNotes>@(ReleaseNotesLines, '%0a')</PackageReleaseNotes>
+    </PropertyGroup>
+  </Target>
 </Project>
