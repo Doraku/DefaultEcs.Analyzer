@@ -5,6 +5,7 @@ on:
     branches:
       - master
     paths:
+      - '.github/workflows/CodeCoverage.yml'
       - 'source/DefaultEcs.Analyzer/**'
       - 'source/DefaultEcs.Analyzer.Test/**'
 
