@@ -26,9 +26,9 @@ jobs:
       run: dotnet test source\DefaultEcs.Analyzer.Test\DefaultEcs.Analyzer.Test.csproj -c Release /p:TEST=true
       
     - name: Decrypte snk file
-      run: gpg --quiet --batch --yes --decrypt --passphrase="$SNK_KEY" --output ds.snk ds.snk.gpg
       env:
         SNK_KEY: ${{ secrets.SNK_KEY }}
+      run: gpg --quiet --batch --yes --decrypt --passphrase="$SNK_KEY" --output ds.snk ds.snk.gpg
 
     - name: Create package
       run: dotnet pack source\DefaultEcs.Analyzer\DefaultEcs.Analyzer.csproj -c Release -o package /p:CI_VERSION=true
