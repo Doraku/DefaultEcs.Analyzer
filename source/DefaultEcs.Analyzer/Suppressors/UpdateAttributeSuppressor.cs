@@ -19,7 +19,12 @@ namespace DefaultEcs.Analyzer.Suppressors
             "IDE0051",
             "Partial class generated.");
 
-        public override ImmutableArray<SuppressionDescriptor> SupportedSuppressions => ImmutableArray.Create(PartialRule, UnusedRule);
+        public static readonly SuppressionDescriptor NonReadOnlyStructAsReadOnlyReferenceRule = new SuppressionDescriptor(
+            "DES0007",
+            "RCS1242",
+            "More explicit.");
+
+        public override ImmutableArray<SuppressionDescriptor> SupportedSuppressions => ImmutableArray.Create(PartialRule, UnusedRule, NonReadOnlyStructAsReadOnlyReferenceRule);
 
         public override void ReportSuppressions(SuppressionAnalysisContext context)
         {
@@ -32,6 +37,7 @@ namespace DefaultEcs.Analyzer.Suppressors
                 else if (context.TryGetMethodSymbol(diagnostic, out IMethodSymbol method) && method.HasUpdateAttribute())
                 {
                     context.ReportSuppression(diagnostic, UnusedRule);
+                    context.ReportSuppression(diagnostic, NonReadOnlyStructAsReadOnlyReferenceRule);
                 }
             }
         }

@@ -24,3 +24,4 @@ ID | Suppressed ID | Justification
 [DES0004](DES0004.md) | RCS1242 | Signature is dictated by its usage as a ComponentPredicate.
 [DES0005](DES0005.md) | RCS1043 | Partial class generated.
 [DES0006](DES0006.md) | IDE0051 | Partial class generated.
+[DES0006](DES0007.md) | RCS1242 | More explicit.
