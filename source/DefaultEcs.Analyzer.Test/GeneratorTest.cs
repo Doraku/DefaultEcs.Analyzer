@@ -35,10 +35,11 @@ namespace DefaultEcs.Benchmark.DefaultEcs
         public float Y;
     }
 
-    internal sealed partial class AutoSystem : AEntitySystem<float>
+    [With(typeof(string))]
+    internal sealed partial class AutoSystem<TParam> : AEntitySystem<float>
     {
         [Update]
-        private void Update(float state, in Speed speed, in Components<int> ints, ref Position position)
+        private void Update(float state, ref TParam p, Dictionary<int, TParam>[] pouet, double? azd, Dictionaty<int, string> agre, in Speed speed, in Components<int> ints, ref Position position)
         {
             position.X += speed.X * state;
             position.Y += speed.Y * state;

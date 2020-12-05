@@ -13,6 +13,7 @@ ID | Title | Category
 [DEA0009](DEA0009.md) | No out parameter can be present in the method decorated by the Update attribute | Correctness
 [DEA0010](DEA0010.md) | The type containing the method decorated by the Update attribute should be partial | Correctness
 [DEA0011](DEA0011.md) | The method decorated by the Update attribute should return void | Correctness
+[DEA0011](DEA0012.md) | The method decorated by the Update attribute should not be generic | Correctness
 
 # Diagnostic Suppressors
 

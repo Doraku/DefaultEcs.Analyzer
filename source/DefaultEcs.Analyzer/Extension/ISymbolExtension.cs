@@ -21,9 +21,11 @@ namespace DefaultEcs.Analyzer.Extension
             "DefaultEcs.System.WhenRemovedAttribute",
             "DefaultEcs.System.WhenRemovedEitherAttribute");
 
-        public static IEnumerable<AttributeData> GetComponentAttributes(this ISymbol symbol) => symbol.GetAttributes().Where(a => _componentAttributes.Contains(a.ToString()));
+        public static IEnumerable<AttributeData> GetComponentAttributes(this ISymbol symbol) => symbol.GetAttributes().Where(a => _componentAttributes.Contains(a.AttributeClass.ToString()));
 
         public static bool HasComponentAttribute(this ISymbol symbol) => symbol.GetComponentAttributes().Any();
+
+        public static bool HasDisabledAttribute(this ISymbol symbol) => symbol.GetAttributes().Any(a => a.ToString() == "DefaultEcs.DisabledAttribute");
 
         public static bool HasSubscribeAttribute(this ISymbol symbol) => symbol.GetAttributes().Any(a => a.ToString() == "DefaultEcs.SubscribeAttribute");
 

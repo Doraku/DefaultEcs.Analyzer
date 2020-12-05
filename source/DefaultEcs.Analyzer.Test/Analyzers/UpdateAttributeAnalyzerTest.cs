@@ -239,6 +239,34 @@ namespace DummyNamespace
 ",
             new DiagnosticResult(new(20, 14), UpdateAttributeAnalyzer.NoOutParameterRule));
 
+        [Fact]
+        public void Should_report_When_generic() => VerifyCSharpDiagnostic(
+@"
+using DefaultEcs.System;
+
+namespace DefaultEcs.System
+{
+    [AttributeUsage(AttributeTargets.Method)]
+    internal sealed class UpdateAttribute : Attribute
+    { }
+}
+
+namespace DummyNamespace
+{
+    partial class DummyClass : AEntitySystem<float>
+    {
+        public DummyClass(World world)
+            : base(world)
+        { }
+
+        [Update]
+        void Update<T>(in Entity entity, float state)
+        { }
+    }
+}
+",
+            new DiagnosticResult(new(20, 14), UpdateAttributeAnalyzer.NoGenericRule));
+
         #endregion
 
         #region DiagnosticVerifier

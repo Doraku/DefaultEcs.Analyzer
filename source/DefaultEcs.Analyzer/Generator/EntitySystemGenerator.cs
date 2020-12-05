@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using DefaultEcs.Analyzer.Extension;
@@ -41,6 +42,8 @@ namespace DefaultEcs.System
 
         public void Execute(GeneratorExecutionContext context)
         {
+            static string GetName(ITypeSymbol type) => type.TypeKind is TypeKind.TypeParameter || (type.SpecialType > 0 && type.SpecialType <= SpecialType.System_String) ? type.ToString() : $"global::{type}";
+
             Compilation compilation = GenerateAttributes(context);
             int systemCount = 0;
 
@@ -55,6 +58,7 @@ namespace DefaultEcs.System
                     .OfType<MethodDeclarationSyntax>()
                     .Select(m => semanticModel.GetDeclaredSymbol(m))
                     .Where(m => m.HasUpdateAttribute()
+                        && !m.IsGenericMethod
                         && m.ContainingType.IsPartial()
                         && m.ContainingType.IsEntitySystem()
                         && m.ContainingType.GetMembers().OfType<IMethodSymbol>().Count(m => m.HasUpdateAttribute()) is 1
@@ -67,28 +71,33 @@ namespace DefaultEcs.System
                     List<string> updateOverrideParameters = new();
                     List<string> parameters = new();
                     List<string> components = new();
-                    List<string> withAttributes = new();
+                    HashSet<ITypeSymbol> parameterTypes = new(SymbolEqualityComparer.IncludeNullability);
+                    bool canRemoveReflection = !type.GetMembers().OfType<IMethodSymbol>().Any(m => m.HasWithPredicateAttribute() && !m.IsStatic);
 
                     bool isBufferType = false;
                     if (type.IsAEntitySystem(out IList<ITypeSymbol> genericTypes))
                     {
-                        updateOverrideParameters.Add($"{genericTypes[0]} state");
+                        updateOverrideParameters.Add($"{GetName(genericTypes[0])} state");
                     }
                     else if (type.IsAEntitiesSystem(out genericTypes))
                     {
-                        updateOverrideParameters.Add($"{genericTypes[0]} state");
-                        updateOverrideParameters.Add($"in {genericTypes[1]} key");
+                        updateOverrideParameters.Add($"{GetName(genericTypes[0])} state");
+                        updateOverrideParameters.Add($"in {GetName(genericTypes[1])} key");
+
+                        canRemoveReflection &= !type.IsIEqualityComparer(genericTypes[1]);
                     }
                     else if (type.IsAEntityBufferedSystem(out genericTypes))
                     {
-                        updateOverrideParameters.Add($"{genericTypes[0]} state");
+                        updateOverrideParameters.Add($"{GetName(genericTypes[0])} state");
                         isBufferType = true;
                     }
                     else if (type.IsAEntitiesBufferedSystem(out genericTypes))
                     {
-                        updateOverrideParameters.Add($"{genericTypes[0]} state");
-                        updateOverrideParameters.Add($"in {genericTypes[1]} key");
+                        updateOverrideParameters.Add($"{GetName(genericTypes[0])} state");
+                        updateOverrideParameters.Add($"in {GetName(genericTypes[1])} key");
                         isBufferType = true;
+
+                        canRemoveReflection &= !type.IsIEqualityComparer(genericTypes[1]);
                     }
 
                     foreach (IParameterSymbol parameter in method.Parameters)
@@ -116,8 +125,10 @@ namespace DefaultEcs.System
                         {
                             string name = $"components{components.Count}";
 
-                            withAttributes.Add($"typeof(global::{parameter.Type})");
-                            components.Add($"            Components<global::{parameter.Type}> {name} = World.GetComponents<global::{parameter.Type}>();");
+                            string typeName = GetName(parameter.Type);
+                            parameterTypes.Add(parameter.Type);
+
+                            components.Add($"            Components<{typeName}> {name} = World.GetComponents<{typeName}>();");
                             parameters.Add($"{(parameter.RefKind == RefKind.Ref ? "ref " : string.Empty)}{name}[entity]");
                         }
                     }
@@ -136,42 +147,113 @@ namespace DefaultEcs.System
 
                     foreach (INamedTypeSymbol parentType in parentTypes)
                     {
-                        code.Append("    ").Append(parentType.DeclaredAccessibility.ToCode()).Append(" partial ").Append(parentType.TypeKind.ToCode()).Append(' ').AppendLine(parentType.Name);
+                        code.Append("    ").Append(parentType.DeclaredAccessibility.ToCode()).Append(" partial ").Append(parentType.TypeKind.ToCode()).Append(' ').AppendLine(parentType.GetName());
                         code.AppendLine("    {");
                     }
 
-                    code.Append("    [With(").Append(string.Join(", ", withAttributes)).AppendLine(")]");
-                    code.Append("    ").Append(type.DeclaredAccessibility.ToCode()).Append(" partial class ").AppendLine(type.Name);
+                    code.Append("    [With(").Append(string.Join(", ", parameterTypes.Where(t => !t.HasTypeParameter()).Select(t => $"typeof({GetName(t)})"))).AppendLine(")]");
+                    code.Append("    ").Append(type.DeclaredAccessibility.ToCode()).Append(" partial class ").AppendLine(type.GetName());
                     code.AppendLine("    {");
 
-                    if (type.Constructors.All(c => c.IsImplicitlyDeclared))
+                    string firstParameter = "world";
+                    if (canRemoveReflection)
                     {
-                        if (isBufferType)
+                        firstParameter += type.HasDisabledAttribute() ? ".GetDisabledEntities()" : ".GetEntities()";
+
+                        foreach (ITypeSymbol parameterType in parameterTypes)
+                        {
+                            firstParameter += $".With<{GetName(parameterType)}>()";
+                        }
+
+                        foreach (AttributeData attribute in type.GetComponentAttributes())
+                        {
+                            string Get(string methodName) => string.Concat(attribute.ConstructorArguments[0].Values.Select(v => v.Value).OfType<ITypeSymbol>().Select(t => $".{methodName}<{GetName(t)}>()"));
+
+                            string GetEither(string methodName)
+                            {
+                                ITypeSymbol[] types = attribute.ConstructorArguments[0].Values.Select(v => v.Value).OfType<ITypeSymbol>().ToArray();
+
+                                return types.Length > 0
+                                    ? $".{methodName}Either<{GetName(types[0])}>(){string.Concat(types.Skip(1).Select(t => $".Or<{GetName(t)}>()"))}"
+                                    : string.Empty;
+                            }
+
+                            firstParameter += attribute.AttributeClass.Name switch
+                            {
+                                "WithAttribute" => Get("With"),
+                                "WithEitherAttribute" => GetEither("With"),
+                                "WithoutAttribute" => Get("Without"),
+                                "WithoutEitherAttribute" => GetEither("Without"),
+                                "WhenAddedAttribute" => Get("WhenAdded"),
+                                "WhenAddedEitherAttribute" => GetEither("WhenAdded"),
+                                "WhenChangedAttribute" => Get("WhenChanged"),
+                                "WhenChangedEitherAttribute" => GetEither("WhenChanged"),
+                                "WhenRemovedAttribute" => Get("WhenRemoved"),
+                                "WhenRemovedEitherAttribute" => GetEither("WhenRemoved"),
+                                _ => string.Empty
+                            };
+                        }
+
+                        foreach (IMethodSymbol predicate in type.GetMembers().OfType<IMethodSymbol>().Where(m => m.HasWithPredicateAttribute() && m.Parameters.Length == 1))
+                        {
+                            firstParameter += $".With<{GetName(predicate.Parameters[0].Type)}>({predicate.Name})";
+                        }
+
+                        firstParameter += genericTypes.Count is 1 ? ".AsSet()" : $".AsMultiMap<{GetName(genericTypes[1])}>()";
+                    }
+
+                    string constructorVisibility = type.Constructors.All(c => c.IsImplicitlyDeclared) ? (type.IsAbstract ? "protected" : "public") : "private";
+
+                    if (isBufferType)
+                    {
+                        if (!type.Constructors.Any(c =>
+                            c.Parameters.Length is 1
+                            && c.Parameters[0].Type.IsWorld()))
                         {
                             code.AppendLine("        [CompilerGenerated]");
-                            code.Append("        public ").Append(type.Name).AppendLine("(World world)");
-                            code.AppendLine("            : base(world)");
+                            code.Append("        ").Append(constructorVisibility).Append(' ').Append(type.Name).AppendLine("(World world)");
+                            code.Append("            : base(").Append(firstParameter).AppendLine(")");
                             code.AppendLine("        { }");
+                            code.AppendLine();
                         }
-                        else
+                    }
+                    else
+                    {
+                        if (!type.Constructors.Any(c =>
+                            c.Parameters.Length is 3
+                            && c.Parameters[0].Type.IsWorld()
+                            && c.Parameters[1].Type.IsIParallelRunner()
+                            && c.Parameters[2].Type.SpecialType is SpecialType.System_Int32))
                         {
                             code.AppendLine("        [CompilerGenerated]");
-                            code.Append("        public ").Append(type.Name).AppendLine("(World world, IParallelRunner runner, int minEntityCountByRunnerIndex)");
-                            code.AppendLine("            : base(world, runner, minEntityCountByRunnerIndex)");
-                            code.AppendLine("        { }");
-                            code.AppendLine();
-                            code.AppendLine("        [CompilerGenerated]");
-                            code.Append("        public ").Append(type.Name).AppendLine("(World world, IParallelRunner runner)");
-                            code.AppendLine("            : this(world, runner, 0)");
-                            code.AppendLine("        { }");
-                            code.AppendLine();
-                            code.AppendLine("        [CompilerGenerated]");
-                            code.Append("        public ").Append(type.Name).AppendLine("(World world)");
-                            code.AppendLine("            : this(world, null, 0)");
+                            code.Append("        ").Append(constructorVisibility).Append(' ').Append(type.Name).AppendLine("(World world, IParallelRunner runner, int minEntityCountByRunnerIndex)");
+                            code.Append("            : base(").Append(firstParameter).AppendLine(", runner, minEntityCountByRunnerIndex)");
                             code.AppendLine("        { }");
                             code.AppendLine();
                         }
-                        code.AppendLine();
+
+                        if (!type.Constructors.Any(c =>
+                            c.Parameters.Length is 2
+                            && c.Parameters[0].Type.IsWorld()
+                            && c.Parameters[1].Type.IsIParallelRunner()))
+                        {
+                            code.AppendLine("        [CompilerGenerated]");
+                            code.Append("        ").Append(constructorVisibility).Append(' ').Append(type.Name).AppendLine("(World world, IParallelRunner runner)");
+                            code.Append("            : base(").Append(firstParameter).AppendLine(", runner)");
+                            code.AppendLine("        { }");
+                            code.AppendLine();
+                        }
+
+                        if (!type.Constructors.Any(c =>
+                            c.Parameters.Length is 1
+                            && c.Parameters[0].Type.IsWorld()))
+                        {
+                            code.AppendLine("        [CompilerGenerated]");
+                            code.Append("        ").Append(constructorVisibility).Append(' ').Append(type.Name).AppendLine("(World world)");
+                            code.Append("            : base(").Append(firstParameter).AppendLine(")");
+                            code.AppendLine("        { }");
+                            code.AppendLine();
+                        }
                     }
 
                     code.AppendLine("        [CompilerGenerated]");

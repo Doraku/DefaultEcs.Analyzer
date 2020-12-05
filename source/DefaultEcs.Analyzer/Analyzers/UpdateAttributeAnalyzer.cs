@@ -63,7 +63,16 @@ namespace DefaultEcs.Analyzer.Analyzers
             true,
             "The method decorated by the Update attribute should return void.");
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(InheritEntitySystemRule, SingleUpdateAttributeRule, NoUpdateOverrideRule, NoOutParameterRule, PartialTypeRule, VoidReturnRule);
+        public static readonly DiagnosticDescriptor NoGenericRule = new DiagnosticDescriptor(
+            "DEA0012",
+            "The method decorated by the Update attribute should not be generic",
+            "Remove the genericity of the method or the Update attribute",
+            DiagnosticCategory.Correctness,
+            DiagnosticSeverity.Error,
+            true,
+            "he method decorated by the Update attribute should not be generic.");
+
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(InheritEntitySystemRule, SingleUpdateAttributeRule, NoUpdateOverrideRule, NoOutParameterRule, PartialTypeRule, VoidReturnRule, NoGenericRule);
 
         public override void Initialize(AnalysisContext context)
         {
@@ -105,6 +114,11 @@ namespace DefaultEcs.Analyzer.Analyzers
                 if (!method.ReturnsVoid)
                 {
                     context.ReportDiagnostic(Diagnostic.Create(VoidReturnRule, method.Locations[0]));
+                }
+
+                if (method.IsGenericMethod)
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(NoGenericRule, method.Locations[0]));
                 }
             }
         }

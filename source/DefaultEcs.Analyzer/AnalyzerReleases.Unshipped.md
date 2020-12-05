@@ -15,3 +15,4 @@ DEA0008 | Correctness | Error | UpdateAttributeAnalyzer
 DEA0009 | Correctness | Error | UpdateAttributeAnalyzer
 DEA0010 | Correctness | Error | UpdateAttributeAnalyzer
 DEA0011 | Correctness | Warning | UpdateAttributeAnalyzer
+DEA0012 | Correctness | Error | UpdateAttributeAnalyzer

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 using Microsoft.CodeAnalysis;
 
 namespace DefaultEcs.Analyzer.Extension
@@ -74,5 +75,13 @@ namespace DefaultEcs.Analyzer.Extension
                 type = type.ContainingType;
             }
         }
+
+        public static bool IsIEqualityComparer(this INamedTypeSymbol type, ITypeSymbol genericType) => type.AllInterfaces.Any(i =>
+            i.IsGenericType
+            && i.ToString().StartsWith("System.Collections.Generic.IEqualityComparer<") is true
+            && i.TypeArguments.Length is 1
+            && i.TypeArguments[0] == genericType);
+
+        public static string GetName(this INamedTypeSymbol type) => type.Name + (type.TypeParameters.Length > 0 ? $"<{string.Join(", ", type.TypeParameters)}>" : string.Empty);
     }
 }
