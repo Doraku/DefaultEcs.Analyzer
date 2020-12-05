@@ -28,6 +28,20 @@ namespace DefaultEcs.System
     [CompilerGenerated, AttributeUsage(AttributeTargets.Method)]
     internal sealed class UpdateAttribute : Attribute
     { }
+
+    /// <summary>
+    /// Used on a parameter of a method decorated by the UpdateAttribute to state that the rule generated for the parameter type is WhenAdded.
+    /// </summary>
+    [CompilerGenerated, AttributeUsage(AttributeTargets.Parameter)]
+    internal sealed class AddedAttribute : Attribute
+    { }
+
+    /// <summary>
+    /// Used on a parameter of a method decorated by the UpdateAttribute to state that the rule generated for the parameter type is WhenChanged.
+    /// </summary>
+    [CompilerGenerated, AttributeUsage(AttributeTargets.Parameter)]
+    internal sealed class ChangedAttribute : Attribute
+    { }
 }";
 
             context.AddSource("Attributes", attributesSource);
@@ -71,7 +85,9 @@ namespace DefaultEcs.System
                     List<string> updateOverrideParameters = new();
                     List<string> parameters = new();
                     List<string> components = new();
-                    HashSet<ITypeSymbol> parameterTypes = new(SymbolEqualityComparer.IncludeNullability);
+                    HashSet<ITypeSymbol> withTypes = new(SymbolEqualityComparer.IncludeNullability);
+                    HashSet<ITypeSymbol> addedTypes = new(SymbolEqualityComparer.IncludeNullability);
+                    HashSet<ITypeSymbol> changedTypes = new(SymbolEqualityComparer.IncludeNullability);
                     bool canRemoveReflection = !type.GetMembers().OfType<IMethodSymbol>().Any(m => m.HasWithPredicateAttribute() && !m.IsStatic);
 
                     bool isBufferType = false;
@@ -126,7 +142,20 @@ namespace DefaultEcs.System
                             string name = $"components{components.Count}";
 
                             string typeName = GetName(parameter.Type);
-                            parameterTypes.Add(parameter.Type);
+
+                            withTypes.Add(parameter.Type);
+
+                            if (parameter.HasAddedAttribute())
+                            {
+                                addedTypes.Add(parameter.Type);
+                                withTypes.Remove(parameter.Type);
+                            }
+
+                            if (parameter.HasChangedAttribute())
+                            {
+                                changedTypes.Add(parameter.Type);
+                                withTypes.Remove(parameter.Type);
+                            }
 
                             components.Add($"            Components<{typeName}> {name} = World.GetComponents<{typeName}>();");
                             parameters.Add($"{(parameter.RefKind == RefKind.Ref ? "ref " : string.Empty)}{name}[entity]");
@@ -151,19 +180,16 @@ namespace DefaultEcs.System
                         code.AppendLine("    {");
                     }
 
-                    code.Append("    [With(").Append(string.Join(", ", parameterTypes.Where(t => !t.HasTypeParameter()).Select(t => $"typeof({GetName(t)})"))).AppendLine(")]");
-                    code.Append("    ").Append(type.DeclaredAccessibility.ToCode()).Append(" partial class ").AppendLine(type.GetName());
-                    code.AppendLine("    {");
-
                     string firstParameter = "world";
                     if (canRemoveReflection)
                     {
                         firstParameter += type.HasDisabledAttribute() ? ".GetDisabledEntities()" : ".GetEntities()";
 
-                        foreach (ITypeSymbol parameterType in parameterTypes)
-                        {
-                            firstParameter += $".With<{GetName(parameterType)}>()";
-                        }
+                        string GetRules(string name, IEnumerable<ITypeSymbol> types) => string.Concat(types.Select(t => $".{name}<{GetName(t)}>()"));
+
+                        firstParameter += GetRules("With", withTypes);
+                        firstParameter += GetRules("WhenAdded", addedTypes);
+                        firstParameter += GetRules("WhenChanged", changedTypes);
 
                         foreach (AttributeData attribute in type.GetComponentAttributes())
                         {
@@ -203,6 +229,22 @@ namespace DefaultEcs.System
                     }
 
                     string constructorVisibility = type.Constructors.All(c => c.IsImplicitlyDeclared) ? (type.IsAbstract ? "protected" : "public") : "private";
+
+                    void WriteAttribute(string name, HashSet<ITypeSymbol> types)
+                    {
+                        types.RemoveWhere(t => t.HasTypeParameter());
+
+                        if (types.Count > 0)
+                        {
+                            code.Append("    [").Append(name).Append('(').Append(string.Join(", ", types.Select(t => $"typeof({GetName(t)})"))).AppendLine(")]");
+                        }
+                    }
+
+                    WriteAttribute("With", withTypes);
+                    WriteAttribute("WhenAdded", addedTypes);
+                    WriteAttribute("WhenChanged", changedTypes);
+                    code.Append("    ").Append(type.DeclaredAccessibility.ToCode()).Append(" partial class ").AppendLine(type.GetName());
+                    code.AppendLine("    {");
 
                     if (isBufferType)
                     {

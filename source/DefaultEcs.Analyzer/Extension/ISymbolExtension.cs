@@ -33,6 +33,10 @@ namespace DefaultEcs.Analyzer.Extension
 
         public static bool HasUpdateAttribute(this ISymbol symbol) => symbol.GetAttributes().Any(a => a.ToString() == "DefaultEcs.System.UpdateAttribute");
 
+        public static bool HasAddedAttribute(this ISymbol symbol) => symbol.GetAttributes().Any(a => a.ToString() == "DefaultEcs.System.AddedAttribute");
+
+        public static bool HasChangedAttribute(this ISymbol symbol) => symbol.GetAttributes().Any(a => a.ToString() == "DefaultEcs.System.ChangedAttribute");
+
         public static bool HasCompilerGeneratedAttribute(this ISymbol symbol) => symbol.GetAttributes().Any(a => a.ToString() == "System.Runtime.CompilerServices.CompilerGeneratedAttribute");
 
         public static string GetNamespace(this ISymbol symbol)
