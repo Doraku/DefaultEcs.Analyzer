@@ -38,6 +38,15 @@ namespace DefaultEcs.Benchmark.DefaultEcs
     [With(typeof(string))]
     internal sealed partial class AutoSystem<TParam> : AEntitySystem<float>
     {
+        [ConstructorParameter]
+        private readonly int _test;
+
+        [ConstructorParameter]
+        public int Gna { get; }
+
+        [ConstructorParameter]
+        public readonly int lol;
+
         [Update]
         private void Update(float state, ref TParam p, Dictionary<int, TParam>[] pouet, double? azd, Dictionaty<int, string> agre, in Speed speed, in Components<int> ints, ref Position position)
         {

@@ -13,9 +13,10 @@ namespace DefaultEcs.Analyzer
     [Generator]
     public sealed class EntitySystemGenerator : ISourceGenerator
     {
+
         private static Compilation GenerateAttributes(GeneratorExecutionContext context)
         {
-            const string attributesSource =
+            const string helpersSource =
 @"
 using System;
 using System.Runtime.CompilerServices;
@@ -27,6 +28,13 @@ namespace DefaultEcs.System
     /// </summary>
     [CompilerGenerated, AttributeUsage(AttributeTargets.Method)]
     internal sealed class UpdateAttribute : Attribute
+    { }
+
+    /// <summary>
+    /// Used on a field or property that need to be set in the generated constructor.
+    /// </summary>
+    [CompilerGenerated, AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
+    internal sealed class ConstructorParameterAttribute : Attribute
     { }
 
     /// <summary>
@@ -44,11 +52,114 @@ namespace DefaultEcs.System
     { }
 }";
 
-            context.AddSource("Attributes", attributesSource);
+            context.AddSource("Helpers", helpersSource);
 
             return context.Compilation.AddSyntaxTrees(CSharpSyntaxTree.ParseText(
-                SourceText.From(attributesSource, Encoding.UTF8),
+                SourceText.From(helpersSource, Encoding.UTF8),
                 (context.Compilation as CSharpCompilation)?.SyntaxTrees[0].Options as CSharpParseOptions));
+        }
+
+        private static string GetName(ITypeSymbol type) => type.TypeKind is TypeKind.TypeParameter || (type.SpecialType > 0 && type.SpecialType <= SpecialType.System_String) ? type.ToString() : $"global::{type}";
+
+        private static string GetStaticWorldParameter(
+            bool canRemoveReflection,
+            INamedTypeSymbol type,
+            ITypeSymbol mapType,
+            IEnumerable<ITypeSymbol> withTypes,
+            IEnumerable<ITypeSymbol> addedTypes,
+            IEnumerable<ITypeSymbol> changedTypes)
+        {
+            string worldParameter = "world";
+            if (canRemoveReflection)
+            {
+                worldParameter += type.HasDisabledAttribute() ? ".GetDisabledEntities()" : ".GetEntities()";
+
+                string GetRules(string name, IEnumerable<ITypeSymbol> types) => string.Concat(types.Select(t => $".{name}<{GetName(t)}>()"));
+
+                worldParameter += GetRules("With", withTypes);
+                worldParameter += GetRules("WhenAdded", addedTypes);
+                worldParameter += GetRules("WhenChanged", changedTypes);
+
+                foreach (AttributeData attribute in type.GetComponentAttributes())
+                {
+                    string Get(string methodName) => string.Concat(attribute.ConstructorArguments[0].Values.Select(v => v.Value).OfType<ITypeSymbol>().Select(t => $".{methodName}<{GetName(t)}>()"));
+
+                    string GetEither(string methodName)
+                    {
+                        ITypeSymbol[] types = attribute.ConstructorArguments[0].Values.Select(v => v.Value).OfType<ITypeSymbol>().ToArray();
+
+                        return types.Length > 0
+                            ? $".{methodName}Either<{GetName(types[0])}>(){string.Concat(types.Skip(1).Select(t => $".Or<{GetName(t)}>()"))}"
+                            : string.Empty;
+                    }
+
+                    worldParameter += attribute.AttributeClass.Name switch
+                    {
+                        "WithAttribute" => Get("With"),
+                        "WithEitherAttribute" => GetEither("With"),
+                        "WithoutAttribute" => Get("Without"),
+                        "WithoutEitherAttribute" => GetEither("Without"),
+                        "WhenAddedAttribute" => Get("WhenAdded"),
+                        "WhenAddedEitherAttribute" => GetEither("WhenAdded"),
+                        "WhenChangedAttribute" => Get("WhenChanged"),
+                        "WhenChangedEitherAttribute" => GetEither("WhenChanged"),
+                        "WhenRemovedAttribute" => Get("WhenRemoved"),
+                        "WhenRemovedEitherAttribute" => GetEither("WhenRemoved"),
+                        _ => string.Empty
+                    };
+                }
+
+                foreach (IMethodSymbol predicate in type.GetMembers().OfType<IMethodSymbol>().Where(m => m.HasWithPredicateAttribute() && m.Parameters.Length == 1))
+                {
+                    worldParameter += $".With<{GetName(predicate.Parameters[0].Type)}>({predicate.Name})";
+                }
+
+                worldParameter += mapType is null ? ".AsSet()" : $".AsMultiMap<{GetName(mapType)}>()";
+            }
+
+            return worldParameter;
+        }
+
+        private static void WriteConstructor(StringBuilder code, INamedTypeSymbol type, string parameters, string baseParameters)
+        {
+            string constructorVisibility = type.Constructors.All(c => c.IsImplicitlyDeclared) ? (type.IsAbstract ? "protected" : "public") : "private";
+
+            List<(string type, string name, string parameterName)> extraParameters = new();
+
+            void Add(ITypeSymbol t, string name)
+            {
+                string parameterName = name.TrimStart('_');
+                parameterName = char.ToLower(parameterName[0]) + parameterName.Substring(1);
+                extraParameters.Add((GetName(t), name != parameterName ? name : $"this.{name}", parameterName));
+            }
+
+            foreach (IFieldSymbol field in type.GetMembers().OfType<IFieldSymbol>().Where(f => !f.IsStatic && !f.IsConst && f.HasConstructorParameterAttribute()))
+            {
+                Add(field.Type, field.Name);
+            }
+
+            foreach (IPropertySymbol property in type.GetMembers().OfType<IPropertySymbol>().Where(p => !p.IsStatic && p.HasConstructorParameterAttribute()))
+            {
+                Add(property.Type, property.Name);
+            }
+
+            code.AppendLine("        [CompilerGenerated]");
+            code.Append("        ").Append(constructorVisibility).Append(' ').Append(type.Name).Append('(').Append(parameters).Append(string.Concat(extraParameters.Select(p => $", {p.type} {p.parameterName}").Distinct())).AppendLine(")");
+            code.Append("            : base(").Append(baseParameters).AppendLine(")");
+            if (extraParameters.Count is 0)
+            {
+                code.AppendLine("        { }");
+            }
+            else
+            {
+                code.AppendLine("        {");
+                foreach (var parameter in extraParameters)
+                {
+                    code.Append("            ").Append(parameter.name).Append(" = ").Append(parameter.parameterName).AppendLine(";");
+                }
+                code.AppendLine("        }");
+            }
+            code.AppendLine();
         }
 
         public void Initialize(GeneratorInitializationContext context)
@@ -56,8 +167,6 @@ namespace DefaultEcs.System
 
         public void Execute(GeneratorExecutionContext context)
         {
-            static string GetName(ITypeSymbol type) => type.TypeKind is TypeKind.TypeParameter || (type.SpecialType > 0 && type.SpecialType <= SpecialType.System_String) ? type.ToString() : $"global::{type}";
-
             Compilation compilation = GenerateAttributes(context);
             int systemCount = 0;
 
@@ -180,55 +289,7 @@ namespace DefaultEcs.System
                         code.AppendLine("    {");
                     }
 
-                    string firstParameter = "world";
-                    if (canRemoveReflection)
-                    {
-                        firstParameter += type.HasDisabledAttribute() ? ".GetDisabledEntities()" : ".GetEntities()";
-
-                        string GetRules(string name, IEnumerable<ITypeSymbol> types) => string.Concat(types.Select(t => $".{name}<{GetName(t)}>()"));
-
-                        firstParameter += GetRules("With", withTypes);
-                        firstParameter += GetRules("WhenAdded", addedTypes);
-                        firstParameter += GetRules("WhenChanged", changedTypes);
-
-                        foreach (AttributeData attribute in type.GetComponentAttributes())
-                        {
-                            string Get(string methodName) => string.Concat(attribute.ConstructorArguments[0].Values.Select(v => v.Value).OfType<ITypeSymbol>().Select(t => $".{methodName}<{GetName(t)}>()"));
-
-                            string GetEither(string methodName)
-                            {
-                                ITypeSymbol[] types = attribute.ConstructorArguments[0].Values.Select(v => v.Value).OfType<ITypeSymbol>().ToArray();
-
-                                return types.Length > 0
-                                    ? $".{methodName}Either<{GetName(types[0])}>(){string.Concat(types.Skip(1).Select(t => $".Or<{GetName(t)}>()"))}"
-                                    : string.Empty;
-                            }
-
-                            firstParameter += attribute.AttributeClass.Name switch
-                            {
-                                "WithAttribute" => Get("With"),
-                                "WithEitherAttribute" => GetEither("With"),
-                                "WithoutAttribute" => Get("Without"),
-                                "WithoutEitherAttribute" => GetEither("Without"),
-                                "WhenAddedAttribute" => Get("WhenAdded"),
-                                "WhenAddedEitherAttribute" => GetEither("WhenAdded"),
-                                "WhenChangedAttribute" => Get("WhenChanged"),
-                                "WhenChangedEitherAttribute" => GetEither("WhenChanged"),
-                                "WhenRemovedAttribute" => Get("WhenRemoved"),
-                                "WhenRemovedEitherAttribute" => GetEither("WhenRemoved"),
-                                _ => string.Empty
-                            };
-                        }
-
-                        foreach (IMethodSymbol predicate in type.GetMembers().OfType<IMethodSymbol>().Where(m => m.HasWithPredicateAttribute() && m.Parameters.Length == 1))
-                        {
-                            firstParameter += $".With<{GetName(predicate.Parameters[0].Type)}>({predicate.Name})";
-                        }
-
-                        firstParameter += genericTypes.Count is 1 ? ".AsSet()" : $".AsMultiMap<{GetName(genericTypes[1])}>()";
-                    }
-
-                    string constructorVisibility = type.Constructors.All(c => c.IsImplicitlyDeclared) ? (type.IsAbstract ? "protected" : "public") : "private";
+                    string worldParameter = GetStaticWorldParameter(canRemoveReflection, type, genericTypes.Skip(1).FirstOrDefault(), withTypes, addedTypes, changedTypes);
 
                     void WriteAttribute(string name, HashSet<ITypeSymbol> types)
                     {
@@ -252,11 +313,7 @@ namespace DefaultEcs.System
                             c.Parameters.Length is 1
                             && c.Parameters[0].Type.IsWorld()))
                         {
-                            code.AppendLine("        [CompilerGenerated]");
-                            code.Append("        ").Append(constructorVisibility).Append(' ').Append(type.Name).AppendLine("(World world)");
-                            code.Append("            : base(").Append(firstParameter).AppendLine(")");
-                            code.AppendLine("        { }");
-                            code.AppendLine();
+                            WriteConstructor(code, type, "World world", worldParameter);
                         }
                     }
                     else
@@ -267,11 +324,7 @@ namespace DefaultEcs.System
                             && c.Parameters[1].Type.IsIParallelRunner()
                             && c.Parameters[2].Type.SpecialType is SpecialType.System_Int32))
                         {
-                            code.AppendLine("        [CompilerGenerated]");
-                            code.Append("        ").Append(constructorVisibility).Append(' ').Append(type.Name).AppendLine("(World world, IParallelRunner runner, int minEntityCountByRunnerIndex)");
-                            code.Append("            : base(").Append(firstParameter).AppendLine(", runner, minEntityCountByRunnerIndex)");
-                            code.AppendLine("        { }");
-                            code.AppendLine();
+                            WriteConstructor(code, type, "World world, IParallelRunner runner, int minEntityCountByRunnerIndex", $"{worldParameter}, runner, minEntityCountByRunnerIndex");
                         }
 
                         if (!type.Constructors.Any(c =>
@@ -279,22 +332,14 @@ namespace DefaultEcs.System
                             && c.Parameters[0].Type.IsWorld()
                             && c.Parameters[1].Type.IsIParallelRunner()))
                         {
-                            code.AppendLine("        [CompilerGenerated]");
-                            code.Append("        ").Append(constructorVisibility).Append(' ').Append(type.Name).AppendLine("(World world, IParallelRunner runner)");
-                            code.Append("            : base(").Append(firstParameter).AppendLine(", runner)");
-                            code.AppendLine("        { }");
-                            code.AppendLine();
+                            WriteConstructor(code, type, "World world, IParallelRunner runner", $"{worldParameter}, runner");
                         }
 
                         if (!type.Constructors.Any(c =>
                             c.Parameters.Length is 1
                             && c.Parameters[0].Type.IsWorld()))
                         {
-                            code.AppendLine("        [CompilerGenerated]");
-                            code.Append("        ").Append(constructorVisibility).Append(' ').Append(type.Name).AppendLine("(World world)");
-                            code.Append("            : base(").Append(firstParameter).AppendLine(")");
-                            code.AppendLine("        { }");
-                            code.AppendLine();
+                            WriteConstructor(code, type, "World world", worldParameter);
                         }
                     }
 
