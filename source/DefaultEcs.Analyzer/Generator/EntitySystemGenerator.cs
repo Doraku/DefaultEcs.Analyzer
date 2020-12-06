@@ -13,7 +13,6 @@ namespace DefaultEcs.Analyzer
     [Generator]
     public sealed class EntitySystemGenerator : ISourceGenerator
     {
-
         private static Compilation GenerateAttributes(GeneratorExecutionContext context)
         {
             const string helpersSource =
@@ -307,40 +306,24 @@ namespace DefaultEcs.System
                     code.Append("    ").Append(type.DeclaredAccessibility.ToCode()).Append(" partial class ").AppendLine(type.GetName());
                     code.AppendLine("    {");
 
-                    if (isBufferType)
+                    if (type.Constructors.All(c => c.IsImplicitlyDeclared))
                     {
-                        if (!type.Constructors.Any(c =>
-                            c.Parameters.Length is 1
-                            && c.Parameters[0].Type.IsWorld()))
+                        if (isBufferType)
                         {
+                            WriteConstructor(code, type, "World world", worldParameter);
+                        }
+                        else
+                        {
+                            WriteConstructor(code, type, "World world, IParallelRunner runner, int minEntityCountByRunnerIndex", $"{worldParameter}, runner, minEntityCountByRunnerIndex");
+                            WriteConstructor(code, type, "World world, IParallelRunner runner", $"{worldParameter}, runner");
                             WriteConstructor(code, type, "World world", worldParameter);
                         }
                     }
-                    else
+                    else if (canRemoveReflection)
                     {
-                        if (!type.Constructors.Any(c =>
-                            c.Parameters.Length is 3
-                            && c.Parameters[0].Type.IsWorld()
-                            && c.Parameters[1].Type.IsIParallelRunner()
-                            && c.Parameters[2].Type.SpecialType is SpecialType.System_Int32))
-                        {
-                            WriteConstructor(code, type, "World world, IParallelRunner runner, int minEntityCountByRunnerIndex", $"{worldParameter}, runner, minEntityCountByRunnerIndex");
-                        }
-
-                        if (!type.Constructors.Any(c =>
-                            c.Parameters.Length is 2
-                            && c.Parameters[0].Type.IsWorld()
-                            && c.Parameters[1].Type.IsIParallelRunner()))
-                        {
-                            WriteConstructor(code, type, "World world, IParallelRunner runner", $"{worldParameter}, runner");
-                        }
-
-                        if (!type.Constructors.Any(c =>
-                            c.Parameters.Length is 1
-                            && c.Parameters[0].Type.IsWorld()))
-                        {
-                            WriteConstructor(code, type, "World world", worldParameter);
-                        }
+                        code.AppendLine("        [CompilerGenerated]");
+                        code.Append("        ").Append("private static ").Append(genericTypes.Count is 1 ? "EntitySet" : $"EntityMap<{GetName(genericTypes[1])}>").Append(" CreateEntityContainer(World world) => ").Append(worldParameter).AppendLine(";");
+                        code.AppendLine();
                     }
 
                     code.AppendLine("        [CompilerGenerated]");
