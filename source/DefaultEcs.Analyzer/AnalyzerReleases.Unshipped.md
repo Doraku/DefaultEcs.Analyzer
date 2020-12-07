@@ -16,3 +16,6 @@ DEA0009 | Correctness | Error | UpdateAttributeAnalyzer
 DEA0010 | Correctness | Error | UpdateAttributeAnalyzer
 DEA0011 | Correctness | Warning | UpdateAttributeAnalyzer
 DEA0012 | Correctness | Error | UpdateAttributeAnalyzer
+DEA0013 | Correctness | Warning | ConstructorParameterAttributeAnalyzer
+DEA0014 | Correctness | Warning | ConstructorParameterAttributeAnalyzer
+DEA0015 | Correctness | Warning | ConstructorParameterAttributeAnalyzer

@@ -14,6 +14,9 @@ ID | Title | Category
 [DEA0010](DEA0010.md) | The type containing the method decorated by the Update attribute should be partial | Correctness
 [DEA0011](DEA0011.md) | The method decorated by the Update attribute should return void | Correctness
 [DEA0011](DEA0012.md) | The method decorated by the Update attribute should not be generic | Correctness
+[DEA0011](DEA0013.md) | The ConstructorParameter attribute should be used on a member of a type which inherit from AEntitySystem, AEntitiesSystem, AEntityBufferedSystem or AEntitiesBufferedSystem | Correctness
+[DEA0011](DEA0014.md) | The ConstructorParameter attribute should be used on a member of a type which has a method with a Update attribute | Correctness
+[DEA0011](DEA0015.md) | The ConstructorParameter attribute should be used on a member of a type which has no constructor defined | Correctness
 
 # Diagnostic Suppressors
 
