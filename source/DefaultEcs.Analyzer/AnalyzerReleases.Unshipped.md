@@ -19,3 +19,7 @@ DEA0012 | Correctness | Error | UpdateAttributeAnalyzer
 DEA0013 | Correctness | Warning | ConstructorParameterAttributeAnalyzer
 DEA0014 | Correctness | Warning | ConstructorParameterAttributeAnalyzer
 DEA0015 | Correctness | Warning | ConstructorParameterAttributeAnalyzer
+DEA0016 | Correctness | Warning | EntityCommandRecorderAttributeAnalyzer
+DEA0017 | Correctness | Error | EntityCommandRecorderAttributeAnalyzer
+DEA0018 | Correctness | Warning | EntityCommandRecorderAttributeAnalyzer
+DEA0019 | Correctness | Error | EntityCommandRecorderAttributeAnalyzer

@@ -47,8 +47,11 @@ namespace DefaultEcs.Benchmark.DefaultEcs
         [ConstructorParameter]
         public readonly int lol;
 
+        [EntityCommandRecorder]
+        public readonly EntityCommandRecorder _recorder;
+
         [Update]
-        private void Update(float state, ref TParam p, Dictionary<int, TParam>[] pouet, double? azd, Dictionaty<int, string> agre, in Speed speed, in Components<int> ints, ref Position position)
+        private void Update(float state, ref TParam p, Dictionary<int, TParam>[] pouet, double? azd, Dictionaty<int, string> agre, in Speed speed, in Components<int> ints, [Notify] ref Position position)
         {
             position.X += speed.X * state;
             position.Y += speed.Y * state;

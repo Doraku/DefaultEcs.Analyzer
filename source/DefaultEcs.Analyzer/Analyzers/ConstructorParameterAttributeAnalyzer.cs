@@ -18,7 +18,7 @@ namespace DefaultEcs.Analyzer.Analyzers
             true,
             "The ConstructorParameter attribute should be used on a member of a type which inherit from AEntitySystem, AEntitiesSystem, AEntityBufferedSystem or AEntitiesBufferedSystem.");
 
-        public static readonly DiagnosticDescriptor HasUpdateAttributeSystemRule = new DiagnosticDescriptor(
+        public static readonly DiagnosticDescriptor UpdateAttributeRule = new DiagnosticDescriptor(
             "DEA0014",
             "The ConstructorParameter attribute should be used on a member of a type which has a method with a Update attribute",
             "Remove the ConstructorParameter attribute from this member or add an Update attribute on a method of its type",
@@ -27,7 +27,7 @@ namespace DefaultEcs.Analyzer.Analyzers
             true,
             "The ConstructorParameter attribute should be used on a member of a type which has a method with a Update attribute.");
 
-        public static readonly DiagnosticDescriptor HasNoConstructorRule = new DiagnosticDescriptor(
+        public static readonly DiagnosticDescriptor NoConstructorRule = new DiagnosticDescriptor(
             "DEA0015",
             "The ConstructorParameter attribute should be used on a member of a type which has no constructor defined",
             "Remove the ConstructorParameter attribute from this member or remove its type constructor",
@@ -36,7 +36,7 @@ namespace DefaultEcs.Analyzer.Analyzers
             true,
             "The ConstructorParameter attribute should be used on a member of a type which has no constructor defined.");
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(InheritEntitySystemRule, HasUpdateAttributeSystemRule, HasNoConstructorRule);
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(InheritEntitySystemRule, UpdateAttributeRule, NoConstructorRule);
 
         public override void Initialize(AnalysisContext context)
         {
@@ -56,12 +56,12 @@ namespace DefaultEcs.Analyzer.Analyzers
 
                 if (context.Symbol.ContainingType.GetMembers().OfType<IMethodSymbol>().All(m => !m.HasUpdateAttribute()))
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(HasUpdateAttributeSystemRule, context.Symbol.Locations[0]));
+                    context.ReportDiagnostic(Diagnostic.Create(UpdateAttributeRule, context.Symbol.Locations[0]));
                 }
 
-                if (context.Symbol.ContainingType.Constructors.Any(c => !c.IsImplicitlyDeclared))
+                if (context.Symbol.ContainingType.Constructors.Any(c => !c.IsImplicitlyDeclared && !c.HasCompilerGeneratedAttribute()))
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(HasNoConstructorRule, context.Symbol.Locations[0]));
+                    context.ReportDiagnostic(Diagnostic.Create(NoConstructorRule, context.Symbol.Locations[0]));
                 }
             }
         }

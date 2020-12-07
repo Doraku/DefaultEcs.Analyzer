@@ -101,7 +101,7 @@ namespace DummyNamespace
     }
 }
 ",
-            new DiagnosticResult(new(20, 30), ConstructorParameterAttributeAnalyzer.HasUpdateAttributeSystemRule));
+            new DiagnosticResult(new(20, 30), ConstructorParameterAttributeAnalyzer.UpdateAttributeRule));
 
         [Fact]
         public void Should_report_When_has_constructor() => VerifyCSharpDiagnostic(
@@ -136,7 +136,7 @@ namespace DummyNamespace
     }
 }
 ",
-            new DiagnosticResult(new(20, 30), ConstructorParameterAttributeAnalyzer.HasNoConstructorRule));
+            new DiagnosticResult(new(20, 30), ConstructorParameterAttributeAnalyzer.NoConstructorRule));
 
         #endregion
 

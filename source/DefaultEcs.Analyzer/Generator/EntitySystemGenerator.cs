@@ -37,6 +37,20 @@ namespace DefaultEcs.System
     { }
 
     /// <summary>
+    /// Used on a field or property of type EntityCommandRecorder.
+    /// </summary>
+    [CompilerGenerated, AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
+    internal sealed class EntityCommandRecorderAttribute : Attribute
+    { }
+
+    /// <summary>
+    /// Used on a parameter of a method decorated by the UpdateAttribute to state that this component should be notified of a change.
+    /// </summary>
+    [CompilerGenerated, AttributeUsage(AttributeTargets.Parameter)]
+    internal sealed class NotifyAttribute : Attribute
+    { }
+
+    /// <summary>
     /// Used on a parameter of a method decorated by the UpdateAttribute to state that the rule generated for the parameter type is WhenAdded.
     /// </summary>
     [CompilerGenerated, AttributeUsage(AttributeTargets.Parameter)]
@@ -196,7 +210,9 @@ namespace DefaultEcs.System
                     HashSet<ITypeSymbol> withTypes = new(SymbolEqualityComparer.IncludeNullability);
                     HashSet<ITypeSymbol> addedTypes = new(SymbolEqualityComparer.IncludeNullability);
                     HashSet<ITypeSymbol> changedTypes = new(SymbolEqualityComparer.IncludeNullability);
+                    HashSet<ITypeSymbol> notifyTypes = new(SymbolEqualityComparer.IncludeNullability);
                     bool canRemoveReflection = !type.GetMembers().OfType<IMethodSymbol>().Any(m => m.HasWithPredicateAttribute() && !m.IsStatic);
+                    string recorderName = type.GetMembers().FirstOrDefault(m => m.HasEntityCommandRecorderAttribute())?.Name;
 
                     bool isBufferType = false;
                     if (type.IsAEntitySystem(out IList<ITypeSymbol> genericTypes))
@@ -213,12 +229,14 @@ namespace DefaultEcs.System
                     else if (type.IsAEntityBufferedSystem(out genericTypes))
                     {
                         updateOverrideParameters.Add($"{GetName(genericTypes[0])} state");
+                        recorderName = null;
                         isBufferType = true;
                     }
                     else if (type.IsAEntitiesBufferedSystem(out genericTypes))
                     {
                         updateOverrideParameters.Add($"{GetName(genericTypes[0])} state");
                         updateOverrideParameters.Add($"in {GetName(genericTypes[1])} key");
+                        recorderName = null;
                         isBufferType = true;
 
                         canRemoveReflection &= !type.IsIEqualityComparer(genericTypes[1]);
@@ -229,6 +247,10 @@ namespace DefaultEcs.System
                         if (parameter.Type.IsEntity() && parameter.RefKind != RefKind.Ref)
                         {
                             parameters.Add("entity");
+                        }
+                        else if (parameter.Type.IsEntityRecord())
+                        {
+                            parameters.Add(recorderName != null ? "record" : "default");
                         }
                         else if (SymbolEqualityComparer.Default.Equals(parameter.Type, genericTypes[0]) && parameter.RefKind == RefKind.None)
                         {
@@ -265,6 +287,11 @@ namespace DefaultEcs.System
                                 withTypes.Remove(parameter.Type);
                             }
 
+                            if (parameter.HasNotifyAttribute() && recorderName != null)
+                            {
+                                notifyTypes.Add(parameter.Type);
+                            }
+
                             components.Add($"            Components<{typeName}> {name} = World.GetComponents<{typeName}>();");
                             parameters.Add($"{(parameter.RefKind == RefKind.Ref ? "ref " : string.Empty)}{name}[entity]");
                         }
@@ -276,6 +303,7 @@ namespace DefaultEcs.System
                     code.AppendLine("using System.Collections.Generic;");
                     code.AppendLine("using System.Runtime.CompilerServices;");
                     code.AppendLine("using DefaultEcs;");
+                    code.AppendLine("using DefaultEcs.Command;");
                     code.AppendLine("using DefaultEcs.System;");
                     code.AppendLine("using DefaultEcs.Threading;");
                     code.AppendLine();
@@ -335,9 +363,32 @@ namespace DefaultEcs.System
                         code.AppendLine(component);
                     }
 
+                    if (components.Count > 0)
+                    {
+                        code.AppendLine();
+                    }
+
                     code.AppendLine("            foreach (ref readonly Entity entity in entities)");
                     code.AppendLine("            {");
+
+                    if (recorderName != null)
+                    {
+                        code.Append("                EntityRecord record = ").Append(recorderName).AppendLine(".Record(entity);");
+                        code.AppendLine();
+                    }
+
                     code.Append("                ").Append(method.Name).Append('(').Append(string.Join(", ", parameters)).AppendLine(");");
+
+                    if (notifyTypes.Count > 0)
+                    {
+                        code.AppendLine();
+                    }
+
+                    foreach (ITypeSymbol componentType in notifyTypes)
+                    {
+                        code.Append("                record.NotifyChanged<").Append(GetName(componentType)).AppendLine(">();");
+                    }
+
                     code.AppendLine("            }");
                     code.AppendLine("        }");
                     code.AppendLine("    }");
