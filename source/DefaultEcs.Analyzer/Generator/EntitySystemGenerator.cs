@@ -37,20 +37,6 @@ namespace DefaultEcs.System
     { }
 
     /// <summary>
-    /// Used on a field or property of type EntityCommandRecorder.
-    /// </summary>
-    [CompilerGenerated, AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
-    internal sealed class EntityCommandRecorderAttribute : Attribute
-    { }
-
-    /// <summary>
-    /// Used on a parameter of a method decorated by the UpdateAttribute to state that this component should be notified of a change.
-    /// </summary>
-    [CompilerGenerated, AttributeUsage(AttributeTargets.Parameter)]
-    internal sealed class NotifyAttribute : Attribute
-    { }
-
-    /// <summary>
     /// Used on a parameter of a method decorated by the UpdateAttribute to state that the rule generated for the parameter type is WhenAdded.
     /// </summary>
     [CompilerGenerated, AttributeUsage(AttributeTargets.Parameter)]
@@ -65,7 +51,7 @@ namespace DefaultEcs.System
     { }
 }";
 
-            context.AddSource("Helpers", helpersSource);
+            context.AddSource("Attributes", helpersSource);
 
             return context.Compilation.AddSyntaxTrees(CSharpSyntaxTree.ParseText(
                 SourceText.From(helpersSource, Encoding.UTF8),
@@ -167,9 +153,9 @@ namespace DefaultEcs.System
             else
             {
                 code.AppendLine("        {");
-                foreach (var parameter in extraParameters)
+                foreach ((string _, string memberName, string parameterName) in extraParameters)
                 {
-                    code.Append("            ").Append(parameter.name).Append(" = ").Append(parameter.parameterName).AppendLine(";");
+                    code.Append("            ").Append(memberName).Append(" = ").Append(parameterName).AppendLine(";");
                 }
                 code.AppendLine("        }");
             }
@@ -196,7 +182,7 @@ namespace DefaultEcs.System
                     .Select(m => semanticModel.GetDeclaredSymbol(m))
                     .Where(m => m.HasUpdateAttribute()
                         && !m.IsGenericMethod
-                        && m.ContainingType.IsPartial()
+                        && m.ContainingType.GetParentTypes().All(t => t.IsPartial())
                         && m.ContainingType.IsEntitySystem()
                         && m.ContainingType.GetMembers().OfType<IMethodSymbol>().Count(m => m.HasUpdateAttribute()) is 1
                         && !m.ContainingType.GetMembers().OfType<IMethodSymbol>().Any(m => m.IsEntitySystemUpdateOverride())
@@ -205,36 +191,30 @@ namespace DefaultEcs.System
                     INamedTypeSymbol type = method.ContainingType;
                     code.Clear();
 
-                    List<string> updateOverrideParameters = new();
+                    string updateOverrideParameters = string.Empty;
                     List<string> parameters = new();
                     List<string> components = new();
                     HashSet<ITypeSymbol> withTypes = new(SymbolEqualityComparer.IncludeNullability);
                     HashSet<ITypeSymbol> addedTypes = new(SymbolEqualityComparer.IncludeNullability);
                     HashSet<ITypeSymbol> changedTypes = new(SymbolEqualityComparer.IncludeNullability);
-                    HashSet<ITypeSymbol> notifyTypes = new(SymbolEqualityComparer.IncludeNullability);
-                    string recorderName = type.GetMembers().FirstOrDefault(m => m.HasEntityCommandRecorderAttribute())?.Name;
 
                     bool isBufferType = false;
                     if (type.IsAEntitySystem(out IList<ITypeSymbol> genericTypes))
                     {
-                        updateOverrideParameters.Add($"{GetName(genericTypes[0])} state");
+                        updateOverrideParameters = $"{GetName(genericTypes[0])} state";
                     }
                     else if (type.IsAEntitiesSystem(out genericTypes))
                     {
-                        updateOverrideParameters.Add($"{GetName(genericTypes[0])} state");
-                        updateOverrideParameters.Add($"in {GetName(genericTypes[1])} key");
+                        updateOverrideParameters = $"{GetName(genericTypes[0])} state, in {GetName(genericTypes[1])} key";
                     }
                     else if (type.IsAEntityBufferedSystem(out genericTypes))
                     {
-                        updateOverrideParameters.Add($"{GetName(genericTypes[0])} state");
-                        recorderName = null;
+                        updateOverrideParameters = $"{GetName(genericTypes[0])} state";
                         isBufferType = true;
                     }
                     else if (type.IsAEntitiesBufferedSystem(out genericTypes))
                     {
-                        updateOverrideParameters.Add($"{GetName(genericTypes[0])} state");
-                        updateOverrideParameters.Add($"in {GetName(genericTypes[1])} key");
-                        recorderName = null;
+                        updateOverrideParameters = $"{GetName(genericTypes[0])} state, in {GetName(genericTypes[1])} key";
                         isBufferType = true;
                     }
 
@@ -243,10 +223,6 @@ namespace DefaultEcs.System
                         if (parameter.Type.IsEntity() && parameter.RefKind != RefKind.Ref)
                         {
                             parameters.Add("entity");
-                        }
-                        else if (parameter.Type.IsEntityRecord())
-                        {
-                            parameters.Add(recorderName != null ? "record" : "default");
                         }
                         else if (SymbolEqualityComparer.Default.Equals(parameter.Type, genericTypes[0]) && parameter.RefKind == RefKind.None)
                         {
@@ -281,11 +257,6 @@ namespace DefaultEcs.System
                             {
                                 changedTypes.Add(parameter.Type);
                                 withTypes.Remove(parameter.Type);
-                            }
-
-                            if (parameter.HasNotifyAttribute() && recorderName != null)
-                            {
-                                notifyTypes.Add(parameter.Type);
                             }
 
                             components.Add($"            Components<{typeName}> {name} = World.GetComponents<{typeName}>();");
@@ -332,7 +303,7 @@ namespace DefaultEcs.System
                     WriteFactory(code, type, genericTypes.Skip(1).FirstOrDefault(), withTypes, addedTypes, changedTypes);
 
                     code.AppendLine("        [CompilerGenerated]");
-                    code.Append("        protected override void Update(").Append(string.Join(", ", updateOverrideParameters)).AppendLine(", ReadOnlySpan<Entity> entities)");
+                    code.Append("        protected override void Update(").Append(updateOverrideParameters).AppendLine(", ReadOnlySpan<Entity> entities)");
                     code.AppendLine("        {");
 
                     foreach (string component in components)
@@ -347,25 +318,7 @@ namespace DefaultEcs.System
 
                     code.AppendLine("            foreach (ref readonly Entity entity in entities)");
                     code.AppendLine("            {");
-
-                    if (recorderName != null)
-                    {
-                        code.Append("                EntityRecord record = ").Append(recorderName).AppendLine(".Record(entity);");
-                        code.AppendLine();
-                    }
-
                     code.Append("                ").Append(method.Name).Append('(').Append(string.Join(", ", parameters)).AppendLine(");");
-
-                    if (notifyTypes.Count > 0)
-                    {
-                        code.AppendLine();
-                    }
-
-                    foreach (ITypeSymbol componentType in notifyTypes)
-                    {
-                        code.Append("                record.NotifyChanged<").Append(GetName(componentType)).AppendLine(">();");
-                    }
-
                     code.AppendLine("            }");
                     code.AppendLine("        }");
                     code.AppendLine("    }");
@@ -377,7 +330,7 @@ namespace DefaultEcs.System
 
                     code.AppendLine("}");
 
-                    context.AddSource($"System{++systemCount}", code.ToString());
+                    context.AddSource($"EntitySystem{++systemCount}", code.ToString());
                 }
             }
         }

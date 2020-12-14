@@ -14,7 +14,7 @@ namespace DefaultEcs.Analyzer.Analyzers
             "The Update attribute should be used on a method of a type which inherit from AEntitySystem, AEntitiesSystem, AEntityBufferedSystem or AEntitiesBufferedSystem",
             "Remove the Update attribute from this method or change the inherited type of the current type",
             DiagnosticCategory.Correctness,
-            DiagnosticSeverity.Warning,
+            DiagnosticSeverity.Error,
             true,
             "The Update attribute should be used on a method of a type which inherit from AEntitySystem, AEntitiesSystem, AEntityBufferedSystem or AEntitiesBufferedSystem.");
 
@@ -59,7 +59,7 @@ namespace DefaultEcs.Analyzer.Analyzers
             "The method decorated by the Update attribute should return void",
             "Change the return type of the method to void",
             DiagnosticCategory.Correctness,
-            DiagnosticSeverity.Warning,
+            DiagnosticSeverity.Info,
             true,
             "The method decorated by the Update attribute should return void.");
 
@@ -70,18 +70,46 @@ namespace DefaultEcs.Analyzer.Analyzers
             DiagnosticCategory.Correctness,
             DiagnosticSeverity.Error,
             true,
-            "he method decorated by the Update attribute should not be generic.");
+            "The method decorated by the Update attribute should not be generic.");
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(InheritEntitySystemRule, SingleUpdateAttributeRule, NoUpdateOverrideRule, NoOutParameterRule, PartialTypeRule, VoidReturnRule, NoGenericRule);
+        public static readonly DiagnosticDescriptor UpdateAttributeRule = new DiagnosticDescriptor(
+            "DEA0016",
+            "The method of a parameter decorated with a Added or Changed attribute should be decorated wit the Update attribute",
+            "Remove the attribute or add the Update attribute to the parameter methode",
+            DiagnosticCategory.Correctness,
+            DiagnosticSeverity.Info,
+            true,
+            "The method of a parameter decorated with a Added or Changed attribute should be decorated wit the Update attribute.");
+
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(
+            InheritEntitySystemRule,
+            SingleUpdateAttributeRule,
+            NoUpdateOverrideRule,
+            NoOutParameterRule,
+            PartialTypeRule,
+            VoidReturnRule,
+            NoGenericRule,
+            UpdateAttributeRule);
 
         public override void Initialize(AnalysisContext context)
         {
             context.EnableConcurrentExecution();
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
-            context.RegisterSymbolAction(AnalyzeSymbol, SymbolKind.Method);
+            context.RegisterSymbolAction(AnalyzeParameterSymbol, SymbolKind.Parameter);
+            context.RegisterSymbolAction(AnalyzeMethodSymbol, SymbolKind.Method);
         }
 
-        private static void AnalyzeSymbol(SymbolAnalysisContext context)
+        private static void AnalyzeParameterSymbol(SymbolAnalysisContext context)
+        {
+            if (context.Symbol is IParameterSymbol parameter
+                && (parameter.HasAddedAttribute() || parameter.HasChangedAttribute())
+                && !parameter.ContainingSymbol.HasUpdateAttribute())
+            {
+                context.ReportDiagnostic(Diagnostic.Create(UpdateAttributeRule, parameter.Locations[0]));
+            }
+        }
+
+        private static void AnalyzeMethodSymbol(SymbolAnalysisContext context)
         {
             if (context.Symbol is IMethodSymbol method
                 && method.HasUpdateAttribute())

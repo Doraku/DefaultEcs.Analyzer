@@ -11,13 +11,7 @@ namespace DefaultEcs.Analyzer.Extension
 
         public static bool IsEntity(this ITypeSymbol type) => type?.ToString() == "DefaultEcs.Entity";
 
-        public static bool IsEntityRecord(this ITypeSymbol type) => type?.ToString() == "DefaultEcs.EntityRecord";
-
-        public static bool IsEntityCommandRecorder(this ITypeSymbol type) => type?.ToString() == "DefaultEcs.Command.EntityCommandRecorder";
-
         public static bool IsComponents(this ITypeSymbol type) => type?.ToString().StartsWith("DefaultEcs.Components<") is true;
-
-        public static bool IsIParallelRunner(this ITypeSymbol type) => type?.ToString() == "DefaultEcs.Threading.IParallelRunner";
 
         public static bool IsPartial(this ITypeSymbol type) => type.DeclaringSyntaxReferences.Select(r => r.GetSyntax()).OfType<TypeDeclarationSyntax>().Any(c => c.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword)));
 

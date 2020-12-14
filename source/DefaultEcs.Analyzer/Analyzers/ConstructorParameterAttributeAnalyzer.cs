@@ -14,7 +14,7 @@ namespace DefaultEcs.Analyzer.Analyzers
             "The ConstructorParameter attribute should be used on a member of a type which inherit from AEntitySystem, AEntitiesSystem, AEntityBufferedSystem or AEntitiesBufferedSystem",
             "Remove the ConstructorParameter attribute from this member or change the inherited type of the current type",
             DiagnosticCategory.Correctness,
-            DiagnosticSeverity.Warning,
+            DiagnosticSeverity.Info,
             true,
             "The ConstructorParameter attribute should be used on a member of a type which inherit from AEntitySystem, AEntitiesSystem, AEntityBufferedSystem or AEntitiesBufferedSystem.");
 
@@ -23,7 +23,7 @@ namespace DefaultEcs.Analyzer.Analyzers
             "The ConstructorParameter attribute should be used on a member of a type which has a method with a Update attribute",
             "Remove the ConstructorParameter attribute from this member or add an Update attribute on a method of its type",
             DiagnosticCategory.Correctness,
-            DiagnosticSeverity.Warning,
+            DiagnosticSeverity.Info,
             true,
             "The ConstructorParameter attribute should be used on a member of a type which has a method with a Update attribute.");
 
@@ -32,7 +32,7 @@ namespace DefaultEcs.Analyzer.Analyzers
             "The ConstructorParameter attribute should be used on a member of a type which has no constructor defined",
             "Remove the ConstructorParameter attribute from this member or remove its type constructor",
             DiagnosticCategory.Correctness,
-            DiagnosticSeverity.Warning,
+            DiagnosticSeverity.Info,
             true,
             "The ConstructorParameter attribute should be used on a member of a type which has no constructor defined.");
 

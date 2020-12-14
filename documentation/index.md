@@ -17,10 +17,6 @@ ID | Title | Category
 [DEA0011](DEA0013.md) | The ConstructorParameter attribute should be used on a member of a type which inherit from AEntitySystem, AEntitiesSystem, AEntityBufferedSystem or AEntitiesBufferedSystem | Correctness
 [DEA0011](DEA0014.md) | The ConstructorParameter attribute should be used on a member of a type which has a method with a Update attribute | Correctness
 [DEA0011](DEA0015.md) | The ConstructorParameter attribute should be used on a member of a type which has no constructor defined | Correctness
-[DEA0011](DEA0016.md) | The EntityCommandRecorder attribute should be used on a member of a type which inherit from AEntitySystem or AEntitiesSystem | Correctness
-[DEA0011](DEA0017.md) | Only one member can be decorated with the EntityCommandRecorder attribute in a given type | Correctness
-[DEA0011](DEA0018.md) | The EntityCommandRecorder attribute should be used on a member of a type which has a method with a Update attribute | Correctness
-[DEA0011](DEA0019.md) | The EntityCommandRecorder attribute should be used on a field or property of type EntityCommandRecorder | Correctness
 
 # Diagnostic Suppressors
 

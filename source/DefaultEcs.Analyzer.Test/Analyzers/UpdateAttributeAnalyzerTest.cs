@@ -19,6 +19,14 @@ namespace DefaultEcs.System
     [AttributeUsage(AttributeTargets.Method)]
     internal sealed class UpdateAttribute : Attribute
     { }
+
+    [AttributeUsage(AttributeTargets.Parameter)]
+    internal sealed class AddedAttribute : Attribute
+    { }
+
+    [AttributeUsage(AttributeTargets.Parameter)]
+    internal sealed class ChangedAttribute : Attribute
+    { }
 }
 
 namespace DummyNamespace
@@ -30,7 +38,7 @@ namespace DummyNamespace
         { }
 
         [Update]
-        void Update(in Entity entity, float state, object dummy)
+        void Update(in Entity entity, float state, [Added] string c1, [Changed] double c2)
         { }
     }
 }
@@ -266,6 +274,39 @@ namespace DummyNamespace
 }
 ",
             new DiagnosticResult(new(20, 14), UpdateAttributeAnalyzer.NoGenericRule));
+
+
+        [Fact]
+        public void Should_report_When_no_Update_attribute() => VerifyCSharpDiagnostic(
+@"
+using DefaultEcs.System;
+
+namespace DefaultEcs.System
+{
+    [AttributeUsage(AttributeTargets.Method)]
+    internal sealed class UpdateAttribute : Attribute
+    { }
+
+    [AttributeUsage(AttributeTargets.Parameter)]
+    internal sealed class AddedAttribute : Attribute
+    { }
+
+    [AttributeUsage(AttributeTargets.Parameter)]
+    internal sealed class ChangedAttribute : Attribute
+    { }
+}
+
+namespace DummyNamespace
+{
+    partial class DummyClass : AEntitySystem<float>
+    {
+        void Update(in Entity entity, float state, [Added] string c1, [Changed] double c2)
+        { }
+    }
+}
+",
+            new DiagnosticResult(new(23, 67), UpdateAttributeAnalyzer.UpdateAttributeRule),
+            new DiagnosticResult(new(23, 88), UpdateAttributeAnalyzer.UpdateAttributeRule));
 
         #endregion
 
