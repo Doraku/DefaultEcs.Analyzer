@@ -27,7 +27,7 @@ namespace DefaultEcs.System
 
 namespace DummyNamespace
 {
-    partial class DummyClass : AEntitySystem<float>
+    partial class DummyClass : AEntitySetSystem<float>
     {
         [ConstructorParameter]
         private readonly int field;
@@ -91,7 +91,7 @@ namespace DefaultEcs.System
 
 namespace DummyNamespace
 {
-    partial class DummyClass : AEntitySystem<float>
+    partial class DummyClass : AEntitySetSystem<float>
     {
         [ConstructorParameter]
         private readonly int field;
@@ -121,7 +121,7 @@ namespace DefaultEcs.System
 
 namespace DummyNamespace
 {
-    partial class DummyClass : AEntitySystem<float>
+    partial class DummyClass : AEntitySetSystem<float>
     {
         [ConstructorParameter]
         private readonly int field;

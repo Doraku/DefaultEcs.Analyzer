@@ -77,7 +77,7 @@ namespace DefaultEcs.System
             }
 
             code.AppendLine("        [CompilerGenerated]");
-            code.Append("        ").Append("private static ").Append(mapType is null ? "EntitySet" : $"EntitiesMap<{GetName(mapType)}>").AppendLine(" CreateEntityContainer(object sender, World world) => world");
+            code.Append("        ").Append("private static ").Append(mapType is null ? "EntitySet" : $"EntityMultiMap<{GetName(mapType)}>").AppendLine(" CreateEntityContainer(object sender, World world) => world");
             code.Append("            ").AppendLine(type.HasDisabledAttribute() ? ".GetDisabledEntities()" : ".GetEntities()");
 
             WriteRules("            ", "With", withTypes);
@@ -199,23 +199,13 @@ namespace DefaultEcs.System
                     HashSet<ITypeSymbol> changedTypes = new(SymbolEqualityComparer.IncludeNullability);
 
                     bool isBufferType = false;
-                    if (type.IsAEntitySystem(out IList<ITypeSymbol> genericTypes))
+                    if (type.IsAEntitySetSystem(out IList<ITypeSymbol> genericTypes))
                     {
                         updateOverrideParameters = $"{GetName(genericTypes[0])} state";
                     }
-                    else if (type.IsAEntitiesSystem(out genericTypes))
+                    else if (type.IsAEntityMultiMapSystem(out genericTypes))
                     {
                         updateOverrideParameters = $"{GetName(genericTypes[0])} state, in {GetName(genericTypes[1])} key";
-                    }
-                    else if (type.IsAEntityBufferedSystem(out genericTypes))
-                    {
-                        updateOverrideParameters = $"{GetName(genericTypes[0])} state";
-                        isBufferType = true;
-                    }
-                    else if (type.IsAEntitiesBufferedSystem(out genericTypes))
-                    {
-                        updateOverrideParameters = $"{GetName(genericTypes[0])} state, in {GetName(genericTypes[1])} key";
-                        isBufferType = true;
                     }
 
                     foreach (IParameterSymbol parameter in method.Parameters)

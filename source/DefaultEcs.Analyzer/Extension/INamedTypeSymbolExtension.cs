@@ -8,16 +8,14 @@ namespace DefaultEcs.Analyzer.Extension
     internal static class INamedTypeSymbolExtension
     {
         private static readonly ImmutableHashSet<string> _entitySystemTypes = ImmutableHashSet.Create(
-            "DefaultEcs.System.AEntitySystem<T>",
-            "DefaultEcs.System.AEntityBufferedSystem<T>",
-            "DefaultEcs.System.AEntitiesSystem<TState, TKey>",
-            "DefaultEcs.System.AEntitiesBufferedSystem<TState, TKey>");
+            "DefaultEcs.System.AEntitySetSystem<T>",
+            "DefaultEcs.System.AEntityMultiMapSystem<TState, TKey>");
 
         public static bool IsEntitySystem(this INamedTypeSymbol type) => !(type is null) && (_entitySystemTypes.Contains(type.ConstructedFrom.ToString()) || type.BaseType.IsEntitySystem());
 
-        public static bool IsAEntitySystem(this INamedTypeSymbol type, out IList<ITypeSymbol> genericTypes)
+        public static bool IsAEntitySetSystem(this INamedTypeSymbol type, out IList<ITypeSymbol> genericTypes)
         {
-            if (type?.ConstructedFrom.ToString() is "DefaultEcs.System.AEntitySystem<T>")
+            if (type?.ConstructedFrom.ToString() is "DefaultEcs.System.AEntitySetSystem<T>")
             {
                 genericTypes = type.TypeArguments;
                 return true;
@@ -25,12 +23,12 @@ namespace DefaultEcs.Analyzer.Extension
 
             genericTypes = null;
 
-            return type?.BaseType.IsAEntitySystem(out genericTypes) is true;
+            return type?.BaseType.IsAEntitySetSystem(out genericTypes) is true;
         }
 
-        public static bool IsAEntityBufferedSystem(this INamedTypeSymbol type, out IList<ITypeSymbol> genericTypes)
+        public static bool IsAEntityMultiMapSystem(this INamedTypeSymbol type, out IList<ITypeSymbol> genericTypes)
         {
-            if (type?.ConstructedFrom.ToString() is "DefaultEcs.System.AEntityBufferedSystem<T>")
+            if (type?.ConstructedFrom.ToString() is "DefaultEcs.System.AEntityMultiMapSystem<TState, TKey>")
             {
                 genericTypes = type.TypeArguments;
                 return true;
@@ -38,33 +36,7 @@ namespace DefaultEcs.Analyzer.Extension
 
             genericTypes = null;
 
-            return type?.BaseType.IsAEntityBufferedSystem(out genericTypes) is true;
-        }
-
-        public static bool IsAEntitiesSystem(this INamedTypeSymbol type, out IList<ITypeSymbol> genericTypes)
-        {
-            if (type?.ConstructedFrom.ToString() is "DefaultEcs.System.AEntitiesSystem<TState, TKey>")
-            {
-                genericTypes = type.TypeArguments;
-                return true;
-            }
-
-            genericTypes = null;
-
-            return type?.BaseType.IsAEntitiesSystem(out genericTypes) is true;
-        }
-
-        public static bool IsAEntitiesBufferedSystem(this INamedTypeSymbol type, out IList<ITypeSymbol> genericTypes)
-        {
-            if (type?.ConstructedFrom.ToString() is "DefaultEcs.System.AEntitiesBufferedSystem<TState, TKey>")
-            {
-                genericTypes = type.TypeArguments;
-                return true;
-            }
-
-            genericTypes = null;
-
-            return type?.BaseType.IsAEntitiesBufferedSystem(out genericTypes) is true;
+            return type?.BaseType.IsAEntityMultiMapSystem(out genericTypes) is true;
         }
 
         public static IEnumerable<INamedTypeSymbol> GetParentTypes(this INamedTypeSymbol type)

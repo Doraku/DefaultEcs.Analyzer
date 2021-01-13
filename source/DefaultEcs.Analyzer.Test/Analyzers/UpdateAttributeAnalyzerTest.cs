@@ -31,7 +31,7 @@ namespace DefaultEcs.System
 
 namespace DummyNamespace
 {
-    partial class DummyClass : AEntitySystem<float>
+    partial class DummyClass : AEntitySetSystem<float>
     {
         public DummyClass(World world)
             : base(world)
@@ -58,7 +58,7 @@ namespace DefaultEcs.System
 
 namespace DummyNamespace
 {
-    class DummyClass : AEntitySystem<float>
+    class DummyClass : AEntitySetSystem<float>
     {
         public DummyClass(World world)
             : base(world)
@@ -88,7 +88,7 @@ namespace DummyNamespace
 {
     class DummyParent
     {
-    partial class DummyClass : AEntitySystem<float>
+    partial class DummyClass : AEntitySetSystem<float>
     {
         public DummyClass(World world)
             : base(world)
@@ -118,7 +118,7 @@ namespace DefaultEcs.System
 
 namespace DummyNamespace
 {
-    partial class DummyClass : AEntitySystem<float>
+    partial class DummyClass : AEntitySetSystem<float>
     {
         public DummyClass(World world)
             : base(world)
@@ -149,7 +149,7 @@ namespace DefaultEcs.System
 
 namespace DummyNamespace
 {
-    partial class DummyClass : AEntitySystem<float>
+    partial class DummyClass : AEntitySetSystem<float>
     {
         public DummyClass(World world)
             : base(world)
@@ -206,7 +206,7 @@ namespace DefaultEcs.System
 
 namespace DummyNamespace
 {
-    partial class DummyClass : AEntitySystem<float>
+    partial class DummyClass : AEntitySetSystem<float>
     {
         public DummyClass(World world)
             : base(world)
@@ -233,7 +233,7 @@ namespace DefaultEcs.System
 
 namespace DummyNamespace
 {
-    partial class DummyClass : AEntitySystem<float>
+    partial class DummyClass : AEntitySetSystem<float>
     {
         public DummyClass(World world)
             : base(world)
@@ -261,7 +261,7 @@ namespace DefaultEcs.System
 
 namespace DummyNamespace
 {
-    partial class DummyClass : AEntitySystem<float>
+    partial class DummyClass : AEntitySetSystem<float>
     {
         public DummyClass(World world)
             : base(world)
@@ -274,7 +274,6 @@ namespace DummyNamespace
 }
 ",
             new DiagnosticResult(new(20, 14), UpdateAttributeAnalyzer.NoGenericRule));
-
 
         [Fact]
         public void Should_report_When_no_Update_attribute() => VerifyCSharpDiagnostic(
@@ -298,7 +297,7 @@ namespace DefaultEcs.System
 
 namespace DummyNamespace
 {
-    partial class DummyClass : AEntitySystem<float>
+    partial class DummyClass : AEntitySetSystem<float>
     {
         void Update(in Entity entity, float state, [Added] string c1, [Changed] double c2)
         { }

@@ -17,13 +17,13 @@ using DefaultEcs.System;
 namespace DummyNamespace
 {
     [With(typeof(bool))]
-    class DummyClass : AEntitySystem<float>
+    class DummyClass : AEntitySetSystem<float>
     {
         [WithPredicate]
         bool DummyMethod(in bool _) => true;
     }
 
-    class DummyClass2 : AEntityBufferedSystem<float>
+    class DummyClass2 : AEntitySetSystem<float>
     {
         [WithPredicate]
         bool DummyMethod(in bool _) => true;
@@ -38,7 +38,7 @@ using DefaultEcs.System;
 
 namespace DummyNamespace
 {
-    class DummyClass : AEntitySystem<float>
+    class DummyClass : AEntitySetSystem<float>
     {
         [WithPredicate]
         void DummyMethod()
@@ -55,7 +55,7 @@ using DefaultEcs.System;
 
 namespace DummyNamespace
 {
-    class DummyClass : AEntitySystem<float>
+    class DummyClass : AEntitySetSystem<float>
     {
         [WithPredicate]
         bool DummyMethod() => true;
@@ -71,7 +71,7 @@ using DefaultEcs.System;
 
 namespace DummyNamespace
 {
-    class DummyClass : AEntitySystem<float>
+    class DummyClass : AEntitySetSystem<float>
     {
         [WithPredicate]
         bool DummyMethod(bool _) => true;

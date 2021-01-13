@@ -19,7 +19,7 @@ using DefaultEcs.System;
 
 namespace DummyNamespace
 {
-    class DummyClass : AEntitySystem<float>
+    class DummyClass : AEntitySetSystem<float>
     {
         public DummyClass(World world)
             : base(world)
@@ -37,7 +37,7 @@ namespace DummyNamespace
         }
 
         [Fact]
-        public void Should_report_DEA0005_When_AEntitySystem()
+        public void Should_report_DEA0005_When_AEntitySetSystem()
         {
             const string code =
 @"
@@ -46,7 +46,7 @@ using DefaultEcs.System;
 
 namespace DummyNamespace
 {
-    class DummyClass : AEntitySystem<float>
+    class DummyClass : AEntitySetSystem<float>
     {
         public DummyClass(World world)
             : base(world)
@@ -136,7 +136,7 @@ namespace DummyNamespace
         }
 
         [Fact]
-        public void Should_report_DEA0005_When_AEntitiesSystem()
+        public void Should_report_DEA0005_When_AEntityMultiMapSystem()
         {
             const string code =
 @"
@@ -145,7 +145,7 @@ using DefaultEcs.System;
 
 namespace DummyNamespace
 {
-    class DummyClass : AEntitiesSystem<float, float>
+    class DummyClass : AEntityMultiMapSystem<float, float>
     {
         public DummyClass(World world)
             : base(world)

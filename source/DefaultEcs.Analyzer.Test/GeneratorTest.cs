@@ -36,7 +36,7 @@ namespace DefaultEcs.Benchmark.DefaultEcs
     }
 
     [With(typeof(string))]
-    internal sealed partial class AutoSystem<TParam> : AEntitySystem<float>
+    internal sealed partial class AutoSystem<TParam> : AEntitySetSystem<float>
     {
         [ConstructorParameter]
         private readonly int _test;

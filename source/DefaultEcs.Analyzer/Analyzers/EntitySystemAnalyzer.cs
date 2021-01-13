@@ -22,12 +22,12 @@ namespace DefaultEcs.Analyzer.Analyzers
 
         public static readonly DiagnosticDescriptor NoEntityModificationRule = new DiagnosticDescriptor(
             "DEA0005",
-            "Entity modification method '{0}' used inside the Update method of AEntitySystem or AEntitiesSystem",
-            "Use an EntityCommandRecorder or change the system to an AEntityBufferedSystem or AEntitiesBufferedSystem",
+            "Entity modification method '{0}' used inside the Update method of AEntitySetSystem or AEntityMultiMapSystem which does not use buffer",
+            "Use an EntityCommandRecorder or change constructor to use buffer",
             DiagnosticCategory.RuntimeError,
             DiagnosticSeverity.Warning,
             true,
-            "Entity modification methods are not thread safe and should not be used inside the Update method of AEntitySystem or AEntitiesSystem.");
+            "Entity modification methods are not thread safe and should not be used inside the Update method of AEntitySetSystem or AEntityMultiMapSystem.");
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(NoEntityModificationRule);
 
@@ -41,7 +41,7 @@ namespace DefaultEcs.Analyzer.Analyzers
         private static void AnalyzeOperation(OperationAnalysisContext context)
         {
             if (context.ContainingSymbol is IMethodSymbol method
-                && (method.ContainingType.IsAEntitySystem(out IList<ITypeSymbol> genericTypes) || method.ContainingType.IsAEntitiesSystem(out genericTypes))
+                && (method.ContainingType.IsAEntitySetSystem(out IList<ITypeSymbol> genericTypes) || method.ContainingType.IsAEntityMultiMapSystem(out genericTypes))
                 && (method.HasUpdateAttribute() || method.IsEntitySystemUpdateOverride(genericTypes)))
             {
                 foreach (InvocationExpressionSyntax invocation in method.DeclaringSyntaxReferences.SelectMany(r => r.GetSyntax().DescendantNodes().OfType<InvocationExpressionSyntax>()))

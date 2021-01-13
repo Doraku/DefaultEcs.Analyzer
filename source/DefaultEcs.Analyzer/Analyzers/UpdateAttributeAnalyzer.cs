@@ -11,12 +11,12 @@ namespace DefaultEcs.Analyzer.Analyzers
     {
         public static readonly DiagnosticDescriptor InheritEntitySystemRule = new DiagnosticDescriptor(
             "DEA0006",
-            "The Update attribute should be used on a method of a type which inherit from AEntitySystem, AEntitiesSystem, AEntityBufferedSystem or AEntitiesBufferedSystem",
+            "The Update attribute should be used on a method of a type which inherit from AEntitySetSystem or AEntityMultiMapSystem",
             "Remove the Update attribute from this method or change the inherited type of the current type",
             DiagnosticCategory.Correctness,
             DiagnosticSeverity.Error,
             true,
-            "The Update attribute should be used on a method of a type which inherit from AEntitySystem, AEntitiesSystem, AEntityBufferedSystem or AEntitiesBufferedSystem.");
+            "The Update attribute should be used on a method of a type which inherit from AEntitySetSystem or AEntityMultiMapSystem.");
 
         public static readonly DiagnosticDescriptor SingleUpdateAttributeRule = new DiagnosticDescriptor(
             "DEA0007",

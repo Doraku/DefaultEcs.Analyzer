@@ -14,10 +14,8 @@ namespace DefaultEcs.Analyzer.Extension
         public static bool IsEntitySystemUpdateOverride(this IMethodSymbol method, IList<ITypeSymbol> genericTypes = null)
         {
             return (genericTypes != null
-                    || method.ContainingType.IsAEntitySystem(out genericTypes)
-                    || method.ContainingType.IsAEntitiesSystem(out genericTypes)
-                    || method.ContainingType.IsAEntityBufferedSystem(out genericTypes)
-                    || method.ContainingType.IsAEntitiesBufferedSystem(out genericTypes))
+                    || method.ContainingType.IsAEntitySetSystem(out genericTypes)
+                    || method.ContainingType.IsAEntityMultiMapSystem(out genericTypes))
                 && method.IsOverride
                 && method.Name == "Update"
                 && method.ReturnsVoid
