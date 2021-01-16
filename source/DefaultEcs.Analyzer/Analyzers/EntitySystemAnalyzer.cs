@@ -40,9 +40,14 @@ namespace DefaultEcs.Analyzer.Analyzers
 
         private static void AnalyzeOperation(OperationAnalysisContext context)
         {
+            static bool CheckUseBuffer(ConstructorDeclarationSyntax constructor) => constructor.Initializer?.ArgumentList.Arguments.Count is 2
+                && constructor.Initializer?.ArgumentList.Arguments[1].Expression is LiteralExpressionSyntax literal
+                && literal.Token.Value is true;
+
             if (context.ContainingSymbol is IMethodSymbol method
                 && (method.ContainingType.IsAEntitySetSystem(out IList<ITypeSymbol> genericTypes) || method.ContainingType.IsAEntityMultiMapSystem(out genericTypes))
-                && (method.HasUpdateAttribute() || method.IsEntitySystemUpdateOverride(genericTypes)))
+                && (method.HasUpdateAttribute() || method.IsEntitySystemUpdateOverride(genericTypes))
+                && !method.ContainingType.Constructors.Any(c => c.Locations.Select(l => l.SourceTree.GetRoot().FindNode(l.SourceSpan)).OfType<ConstructorDeclarationSyntax>().Any(CheckUseBuffer)))
             {
                 foreach (InvocationExpressionSyntax invocation in method.DeclaringSyntaxReferences.SelectMany(r => r.GetSyntax().DescendantNodes().OfType<InvocationExpressionSyntax>()))
                 {
