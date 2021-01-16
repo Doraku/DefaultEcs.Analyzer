@@ -27,7 +27,28 @@ namespace DefaultEcs.System
     /// </summary>
     [CompilerGenerated, AttributeUsage(AttributeTargets.Method)]
     internal sealed class UpdateAttribute : Attribute
-    { }
+    {
+        /// <summary>
+        /// Whether to only generate constructor using buffer.
+        /// </summary>
+        public readonly bool UseBuffer;
+
+        /// <summary>
+        /// Initialize a new instance of the UpdateAttribute type.
+        /// </summary>
+        /// <param name=""useBuffer"">Whether to only generate constructor using buffer.</param>
+        public UpdateAttribute(bool useBuffer)
+        {
+            UseBuffer = useBuffer;
+        }
+
+        /// <summary>
+        /// Initialize a new instance of the UpdateAttribute type.
+        /// </summary>
+        public UpdateAttribute()
+            : this(false)
+        { }
+    }
 
     /// <summary>
     /// Used on a field or property that need to be set in the generated constructor.
@@ -173,6 +194,7 @@ namespace DefaultEcs.System
             foreach (SyntaxTree tree in compilation.SyntaxTrees)
             {
                 SemanticModel semanticModel = compilation.GetSemanticModel(tree);
+                bool useBuffer = false;
 
                 StringBuilder code = new StringBuilder();
                 foreach (IMethodSymbol method in tree
@@ -180,7 +202,7 @@ namespace DefaultEcs.System
                     .DescendantNodesAndSelf()
                     .OfType<MethodDeclarationSyntax>()
                     .Select(m => semanticModel.GetDeclaredSymbol(m))
-                    .Where(m => m.HasUpdateAttribute()
+                    .Where(m => m.HasUpdateAttribute(out useBuffer)
                         && !m.IsGenericMethod
                         && m.ContainingType.GetParentTypes().All(t => t.IsPartial())
                         && m.ContainingType.IsEntitySystem()
@@ -198,7 +220,6 @@ namespace DefaultEcs.System
                     HashSet<ITypeSymbol> addedTypes = new(SymbolEqualityComparer.IncludeNullability);
                     HashSet<ITypeSymbol> changedTypes = new(SymbolEqualityComparer.IncludeNullability);
 
-                    bool isBufferType = false;
                     if (type.IsAEntitySetSystem(out IList<ITypeSymbol> genericTypes))
                     {
                         updateOverrideParameters = $"{GetName(genericTypes[0])} state";
@@ -278,9 +299,9 @@ namespace DefaultEcs.System
 
                     if (type.Constructors.All(c => c.IsImplicitlyDeclared))
                     {
-                        if (isBufferType)
+                        if (useBuffer)
                         {
-                            WriteConstructor(code, type, "World world", "world, CreateEntityContainer");
+                            WriteConstructor(code, type, "World world", "world, CreateEntityContainer, true");
                         }
                         else
                         {
