@@ -15,6 +15,7 @@ The main repo for DefaultEcs is [here](https://github.com/Doraku/DefaultEcs/), t
 
 - [Requirement](#Requirement)
 - [Versioning](#Versioning)
+- [Code generation](#Code)
 
 <a name='Requirement'></a>
 # Requirement
@@ -25,3 +26,116 @@ This is the current strategy used to version DefaultEcs.Analyzer: v0.major.minor
 - 0: DefaultEcs is still in heavy development and although a lot of care is given to not break the current api, it can still happen
 - major: incremented when there is a breaking change (reset minor number)
 - minor: incremented when there is a new feature or a bug fix
+
+<a name='Code'></a>
+# Code generation
+Referencing DefaultEcs.Analyzer in your project gives you access to some attributes to automatically generate code for you:
+
+## UpdateAttribute
+This attribute should be used on a void method inside a type inheriting `AEntitySetSystem` or `AEntityMultiMapSystem`.
+```csharp
+    public sealed partial class MovementSystem : AEntitySetSystem<float>
+    {
+        [Update]
+        private static void Update(float time, ref Position position, in LinearVelocity linearVelocity)
+        {
+            position.Value += linearVelocity.Value * time;
+        }
+    }
+```
+
+The containing type need to be declared as partial for the code generation to work. Your system component composition will be deduced from the parameters of the method. In the example above, it would be `world.GetEntities().With<Position>().With<LinearVelocity>().AsSet()`.
+
+Parameters can be requested as `ref` or `in` depending on whether you want to change their value or not.  
+If a parameter has the same type as the generic type of the system, it is the state of `ISystem.Update` method that is passed and not a component (`float` in the example above).
+
+You can request the `Entity` as a parameter too, this is usefull of you want to use it to record action on a `EntityCommandRecorder`.
+```csharp
+    public sealed partial class MovementSystem : AEntitySetSystem<float>
+    {
+        [Update]
+        private static void Update(float time, in Entity entity, ref Position position, in LinearVelocity linearVelocity)
+        {
+            position.Value += linearVelocity.Value * time;
+        }
+    }
+```
+
+If you need to define more exotic rules, all attributes (`WithAttribute`, `WithoutAttribute`, `DisabledAttribute`, ...) that you normally definie on the parent type will also be used.
+```csharp
+    [Without(typeof(bool))]
+    public sealed partial class MovementSystem : AEntitySetSystem<float>
+    {
+        [Update]
+        private static void Update(float time, ref Position position, in LinearVelocity linearVelocity)
+        {
+            position.Value += linearVelocity.Value * time;
+        }
+
+        [WithPredicate]
+        private bool Filter(in int _) => true;
+    }
+```
+
+This would generate `world.GetEntities().With<Position>().With<LinearVelocity>().Without<bool>().With(Filter).AsSet()` for you.
+
+If for some reason you need to define a constructor, you can use the factory overcharge of the base type with the produced `CreateEntityContainer` method.
+```csharp
+    public sealed partial class PlayerSystem : AEntitySetSystem<float>
+    {
+        public PlayerSystem(World world)
+            : base(world, CreateEntityContainer, null, 0)
+        { }
+
+        [Update]
+        private static void Update(...)
+        {
+            ...
+        }
+    }
+```
+
+If your system need to use a buffer to process entities (no multithreading and need to do composition change operation), you can do so by setting the `useBuffer` parameter of the attribute to `true`.
+```csharp
+    public sealed partial class MovementSystem : AEntitySetSystem<float>
+    {
+        [Update(true)]
+        private static void Update(float time, ref Position position, in LinearVelocity linearVelocity)
+        {
+            position.Value += linearVelocity.Value * time;
+        }
+    }
+```
+
+## ConstructorParameterAttribute
+If you need some fields or properties to be set in the constructor of your system but still want it to be done for you, you can decorate them with the attribute.
+```csharp
+    public sealed partial class MovementSystem : AEntitySetSystem<float>
+    {
+        [ConstructorParameter]
+        private readonly int _myField;
+
+        [Update]
+        private static void Update(float time, in Entity entity, ref Position position, in LinearVelocity linearVelocity)
+        {
+            position.Value += linearVelocity.Value * time;
+        }
+    }
+```
+
+The generated constructors for the above example will request an extra `int myField` parameter.
+
+## AddedAttribute, ChangedAttribute
+If you need reactive rules on the component composition, you can do so by decorating the parameter of your `Update` method.
+```csharp
+    public sealed partial class MovementSystem : AEntitySetSystem<float>
+    {
+        [Update]
+        private static void Update(float time, [Added][Changed] ref Position position, in LinearVelocity linearVelocity)
+        {
+            position.Value += linearVelocity.Value * time;
+        }
+    }
+```
+
+This would generate `world.GetEntities().WhenAdded<Position>().WhenChanged<Position>().With<LinearVelocity>().AsSet()`.
