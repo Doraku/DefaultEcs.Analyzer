@@ -10,7 +10,7 @@ The main repo for DefaultEcs is [here](https://github.com/Doraku/DefaultEcs/), t
 [![preview package](https://img.shields.io/badge/preview-package-blue?style=flat&logo=github)](https://github.com/Doraku/DefaultEcs.Analyzer/packages/502961)
 [![Join the chat at https://gitter.im/Doraku/DefaultEcs](https://badges.gitter.im/Doraku/DefaultEcs.svg)](https://gitter.im/Doraku/DefaultEcs?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-- [Release note](./documentation/RELEASENOTE.md 'Release note')
+- [Release note](./documentation/RELEASENOTES.md 'Release notes')
 <a/>
 
 - [Requirement](#Requirement)

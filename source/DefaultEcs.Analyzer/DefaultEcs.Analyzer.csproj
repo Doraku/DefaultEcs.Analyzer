@@ -32,7 +32,7 @@
     <Description>Roslyn analyzers for DefaultEcs users.</Description>
     <PackageIcon>logo.png</PackageIcon>
     <PackageProjectUrl>https://github.com/Doraku/DefaultEcs.Analyzer</PackageProjectUrl>
-    <PackageLicenseExpression>MIT-0</PackageLicenseExpression>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/Doraku/DefaultEcs.Analyzer.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>gamedev game-development game-engine ecs entity-component-system</PackageTags>
