@@ -27,14 +27,13 @@ jobs:
       run: gpg --quiet --batch --yes --decrypt --passphrase="$env:SNK_KEY" --output ds.snk ds.snk.gpg
 
     - name: Create package
-      run: dotnet pack source\DefaultEcs.Analyzer\DefaultEcs.Analyzer.csproj -c Release -o package /p:Version=${{ github.event.release.tag_name }}
-
-    - name: Create NEW_RELEASENOTES.txt
+      run: dotnet pack source\DefaultEcs.Analyzer\DefaultEcs.Analyzer.csproj -c Release -o build /p:Version=${{ github.event.release.tag_name }}
+      
+    - name: Create RELEASE.txt
       run: |
-        echo "## DefaultEcs.Analyzer ${{ github.event.release.tag_name }}" | Out-File package\NEW_RELEASENOTES.txt
-        type documentation\NEXT_RELEASENOTES.txt | Out-File package\NEW_RELEASENOTES.txt -Append
-        echo "" | Out-File package\NEW_RELEASENOTES.txt -Append
-        echo "[nuget package](https://www.nuget.org/packages/DefaultEcs.Analyzer/${{ github.event.release.tag_name }})" | Out-File package\NEW_RELEASENOTES.txt -Append
+        type documentation\NEXT_RELEASENOTES.txt | Out-File build\RELEASE.txt
+        echo "" | Out-File build\RELEASE.txt -Append
+        echo "[nuget package](https://www.nuget.org/packages/DefaultEcs.Analyzer/${{ github.event.release.tag_name }})" | Out-File build\RELEASE.txt -Append
 
     - name: Update release
       uses: tubone24/update_release@v1.1.0
@@ -42,19 +41,17 @@ jobs:
         GITHUB_TOKEN: ${{ github.token }}
       with:
         release_name: DefaultEcs.Analyzer ${{ github.event.release.tag_name }}
-        body_path: .\package\NEW_RELEASENOTES.txt
+        prerelease: ${{ contains(github.event.release.tag_name, '-') }}
+        body_path: .\build\NEW_RELEASENOTES.txt
         
-    - name: Update RELEASENOTES.md
-      run: |
-        echo "" | Out-File package\NEW_RELEASENOTES.txt -Append
-        type documentation\RELEASENOTES.md | Out-File package\NEW_RELEASENOTES.txt -Append
-        type package\NEW_RELEASENOTES.txt | Out-File documentation\RELEASENOTES.md
-        echo "" | Out-File documentation\NEXT_RELEASENOTES.txt -NoNewLine
-
+    - name: Clear NEXT_RELEASENOTES.txt
+      run: echo "" | Out-File documentation\NEXT_RELEASENOTES.txt -NoNewLine
+        
     - name: Publish package
-      run: dotnet nuget push package\*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+      run: dotnet nuget push build\*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
 
     - name: Commit RELEASENOTES and documentation api
+      if: "!contains(github.event.release.tag_name, '-')"
       run: |
         git config --local user.email "$(git log --format='%ae' HEAD^!)"
         git config --local user.name "$(git log --format='%an' HEAD^!)"
