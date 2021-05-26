@@ -95,17 +95,20 @@ If for some reason you need to define a constructor, you can use the factory ove
     }
 ```
 
-If your system need to use a buffer to process entities (no multithreading and need to do composition change operation), you can do so by setting the `useBuffer` parameter of the attribute to `true`.
+## UseBufferAttribute
+If your system need to use a buffer to process entities (no multithreading and need to do composition change operation), you can add this attribute with the `UpdateAttribute`.
 ```csharp
     public sealed partial class MovementSystem : AEntitySetSystem<float>
     {
-        [Update(true)]
+        [Update, UseBuffer]
         private static void Update(float time, ref Position position, in LinearVelocity linearVelocity)
         {
             position.Value += linearVelocity.Value * time;
         }
     }
 ```
+
+The correct constructors will be generated for you.
 
 ## ConstructorParameterAttribute
 If you need some fields or properties to be set in the constructor of your system but still want it to be done for you, you can decorate them with the attribute.
