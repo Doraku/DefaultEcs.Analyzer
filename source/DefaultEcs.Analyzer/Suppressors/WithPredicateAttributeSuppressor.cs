@@ -8,12 +8,12 @@ namespace DefaultEcs.Analyzer.Suppressors
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class WithPredicateAttributeSuppressor : DiagnosticSuppressor
     {
-        public static readonly SuppressionDescriptor UnusedRule = new SuppressionDescriptor(
+        public static readonly SuppressionDescriptor UnusedRule = new(
             "DES0002",
             "IDE0051",
             "Private member is used by reflection.");
 
-        public static readonly SuppressionDescriptor InRule = new SuppressionDescriptor(
+        public static readonly SuppressionDescriptor InRule = new(
             "DES0004",
             "RCS1242",
             "Signature is dictated by its usage as a ComponentPredicate.");

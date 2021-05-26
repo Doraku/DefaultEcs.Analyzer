@@ -8,7 +8,7 @@ namespace DefaultEcs.Analyzer.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class SubscribeAttributeAnalyzer : DiagnosticAnalyzer
     {
-        public static readonly DiagnosticDescriptor CorrectSignatureRule = new DiagnosticDescriptor(
+        public static readonly DiagnosticDescriptor CorrectSignatureRule = new(
             "DEA0001",
             "SubscribeAttribute used on an invalid method",
             "Remove SubscribeAttribute from the '{0}' method or change the method signature",

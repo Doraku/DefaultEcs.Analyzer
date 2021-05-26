@@ -13,10 +13,11 @@ ID | Title | Category
 [DEA0009](DEA0009.md) | No out parameter can be present in the method decorated by the Update attribute | Correctness
 [DEA0010](DEA0010.md) | The type containing the method decorated by the Update attribute should be partial | Correctness
 [DEA0011](DEA0011.md) | The method decorated by the Update attribute should return void | Correctness
-[DEA0011](DEA0012.md) | The method decorated by the Update attribute should not be generic | Correctness
-[DEA0011](DEA0013.md) | The ConstructorParameter attribute should be used on a member of a type which inherit from AEntitySetSystem or AEntityMultiMapSystem | Correctness
-[DEA0011](DEA0014.md) | The ConstructorParameter attribute should be used on a member of a type which has a method with a Update attribute | Correctness
-[DEA0011](DEA0015.md) | The ConstructorParameter attribute should be used on a member of a type which has no constructor defined | Correctness
+[DEA0012](DEA0012.md) | The method decorated by the Update attribute should not be generic | Correctness
+[DEA0013](DEA0013.md) | The ConstructorParameter attribute should be used on a member of a type which inherit from AEntitySetSystem or AEntityMultiMapSystem | Correctness
+[DEA0014](DEA0014.md) | The ConstructorParameter attribute should be used on a member of a type which has a method with a Update attribute | Correctness
+[DEA0015](DEA0015.md) | The ConstructorParameter attribute should be used on a member of a type which has no constructor defined | Correctness
+[DEA0016](DEA0016.md) | The method of a parameter decorated with a Added or Changed attribute should be decorated wit the Update attribute | Correctness
 
 # Diagnostic Suppressors
 

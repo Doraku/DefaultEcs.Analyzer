@@ -8,12 +8,12 @@ namespace DefaultEcs.Analyzer.Suppressors
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class SubscribeAttributeSuppressor : DiagnosticSuppressor
     {
-        public static readonly SuppressionDescriptor UnusedRule = new SuppressionDescriptor(
+        public static readonly SuppressionDescriptor UnusedRule = new(
             "DES0001",
             "IDE0051",
             "Private member is used by reflection.");
 
-        public static readonly SuppressionDescriptor InRule = new SuppressionDescriptor(
+        public static readonly SuppressionDescriptor InRule = new(
             "DES0003",
             "RCS1242",
             "Signature is dictated by IPublisher.");

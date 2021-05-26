@@ -27,28 +27,14 @@ namespace DefaultEcs.System
     /// </summary>
     [CompilerGenerated, AttributeUsage(AttributeTargets.Method)]
     internal sealed class UpdateAttribute : Attribute
-    {
-        /// <summary>
-        /// Whether to only generate constructor using buffer.
-        /// </summary>
-        public readonly bool UseBuffer;
+    { }
 
-        /// <summary>
-        /// Initialize a new instance of the UpdateAttribute type.
-        /// </summary>
-        /// <param name=""useBuffer"">Whether to only generate constructor using buffer.</param>
-        public UpdateAttribute(bool useBuffer)
-        {
-            UseBuffer = useBuffer;
-        }
-
-        /// <summary>
-        /// Initialize a new instance of the UpdateAttribute type.
-        /// </summary>
-        public UpdateAttribute()
-            : this(false)
-        { }
-    }
+    /// <summary>
+    /// Makes so that the entities will be copied into a buffer before processing.
+    /// </summary>
+    [CompilerGenerated, AttributeUsage(AttributeTargets.Method)]
+    internal sealed class UseBufferAttribute : Attribute
+    { }
 
     /// <summary>
     /// Used on a field or property that need to be set in the generated constructor.
@@ -194,15 +180,14 @@ namespace DefaultEcs.System
             foreach (SyntaxTree tree in compilation.SyntaxTrees)
             {
                 SemanticModel semanticModel = compilation.GetSemanticModel(tree);
-                bool useBuffer = false;
 
-                StringBuilder code = new StringBuilder();
+                StringBuilder code = new();
                 foreach (IMethodSymbol method in tree
                     .GetRoot()
                     .DescendantNodesAndSelf()
                     .OfType<MethodDeclarationSyntax>()
                     .Select(m => semanticModel.GetDeclaredSymbol(m))
-                    .Where(m => m.HasUpdateAttribute(out useBuffer)
+                    .Where(m => m.HasUpdateAttribute()
                         && !m.IsGenericMethod
                         && m.ContainingType.GetParentTypes().All(t => t.IsPartial())
                         && m.ContainingType.IsEntitySystem()
@@ -213,6 +198,7 @@ namespace DefaultEcs.System
                     INamedTypeSymbol type = method.ContainingType;
                     code.Clear();
 
+                    bool useBuffer = method.HasUseBufferAttribute();
                     string updateOverrideParameters = string.Empty;
                     List<string> parameters = new();
                     List<string> components = new();
@@ -341,7 +327,7 @@ namespace DefaultEcs.System
 
                     code.AppendLine("}");
 
-                    context.AddSource($"EntitySystem{++systemCount}", code.ToString());
+                    context.AddSource($"{type.Name}_EntitySystem{++systemCount}", code.ToString());
                 }
             }
         }

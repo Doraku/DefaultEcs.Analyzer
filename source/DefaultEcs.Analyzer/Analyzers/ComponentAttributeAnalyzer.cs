@@ -8,7 +8,7 @@ namespace DefaultEcs.Analyzer.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class ComponentAttributeAnalyzer : DiagnosticAnalyzer
     {
-        public static readonly DiagnosticDescriptor CorrectSignatureRule = new DiagnosticDescriptor(
+        public static readonly DiagnosticDescriptor CorrectSignatureRule = new(
             "DEA0002",
             "WithPredicateAttribute used on an invalid method",
             "Remove WithPredicateAttribute from the '{0}' method or change the method signature",
@@ -17,7 +17,7 @@ namespace DefaultEcs.Analyzer.Analyzers
             true,
             "WithPredicateAttribute should only be used on method with the ComponentPredicate signature.");
 
-        public static readonly DiagnosticDescriptor ContainingTypeInheritEntitySystemRule = new DiagnosticDescriptor(
+        public static readonly DiagnosticDescriptor ContainingTypeInheritEntitySystemRule = new(
             "DEA0003",
             "WithPredicateAttribute used on a method which is not a member of AEntitySetSystem or AEntityMultiMapSystem",
             "Remove WithPredicateAttribute from the '{0}' method",
@@ -26,7 +26,7 @@ namespace DefaultEcs.Analyzer.Analyzers
             true,
             "WithPredicateAttribute should only be used on method member of AEntitySetSystem or AEntityMultiMapSystem.");
 
-        public static readonly DiagnosticDescriptor InheritEntitySystemRule = new DiagnosticDescriptor(
+        public static readonly DiagnosticDescriptor InheritEntitySystemRule = new(
             "DEA0004",
             "Component attribute used on a type which is not derived from AEntitySetSystem or AEntityMultiMapSystem",
             "Remove '{1}' from the '{0}' type",

@@ -20,7 +20,7 @@ namespace DefaultEcs.Analyzer.Analyzers
             "NotifyChanged",
             "Dispose");
 
-        public static readonly DiagnosticDescriptor NoEntityModificationRule = new DiagnosticDescriptor(
+        public static readonly DiagnosticDescriptor NoEntityModificationRule = new(
             "DEA0005",
             "Entity modification method '{0}' used inside the Update method of AEntitySetSystem or AEntityMultiMapSystem which does not use buffer",
             "Use an EntityCommandRecorder or change constructor to use buffer",
@@ -46,7 +46,7 @@ namespace DefaultEcs.Analyzer.Analyzers
 
             if (context.ContainingSymbol is IMethodSymbol method
                 && (method.ContainingType.IsAEntitySetSystem(out IList<ITypeSymbol> genericTypes) || method.ContainingType.IsAEntityMultiMapSystem(out genericTypes))
-                && ((method.HasUpdateAttribute(out bool useBuffer) && !useBuffer) || method.IsEntitySystemUpdateOverride(genericTypes))
+                && ((method.HasUpdateAttribute() && !method.HasUseBufferAttribute()) || method.IsEntitySystemUpdateOverride(genericTypes))
                 && !method.ContainingType.Constructors.Any(c => c.Locations.Select(l => l.SourceTree.GetRoot().FindNode(l.SourceSpan)).OfType<ConstructorDeclarationSyntax>().Any(CheckUseBuffer)))
             {
                 foreach (InvocationExpressionSyntax invocation in method.DeclaringSyntaxReferences.SelectMany(r => r.GetSyntax().DescendantNodes().OfType<InvocationExpressionSyntax>()))

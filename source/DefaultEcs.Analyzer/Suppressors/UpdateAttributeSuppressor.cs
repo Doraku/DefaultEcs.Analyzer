@@ -9,17 +9,17 @@ namespace DefaultEcs.Analyzer.Suppressors
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class UpdateAttributeSuppressor : DiagnosticSuppressor
     {
-        public static readonly SuppressionDescriptor PartialRule = new SuppressionDescriptor(
+        public static readonly SuppressionDescriptor PartialRule = new(
             "DES0005",
             "RCS1043",
             "Partial class generated.");
 
-        public static readonly SuppressionDescriptor UnusedRule = new SuppressionDescriptor(
+        public static readonly SuppressionDescriptor UnusedRule = new(
             "DES0006",
             "IDE0051",
             "Partial class generated.");
 
-        public static readonly SuppressionDescriptor NonReadOnlyStructAsReadOnlyReferenceRule = new SuppressionDescriptor(
+        public static readonly SuppressionDescriptor NonReadOnlyStructAsReadOnlyReferenceRule = new(
             "DES0007",
             "RCS1242",
             "More explicit.");

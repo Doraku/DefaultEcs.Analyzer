@@ -81,8 +81,8 @@ namespace TestHelper
 
             for (int i = 0; i < attempts; ++i)
             {
-                List<CodeAction> actions = new List<CodeAction>();
-                CodeFixContext context = new CodeFixContext(document, analyzerDiagnostics[0], (a, _) => actions.Add(a), CancellationToken.None);
+                List<CodeAction> actions = new();
+                CodeFixContext context = new(document, analyzerDiagnostics[0], (a, _) => actions.Add(a), CancellationToken.None);
                 codeFixProvider.RegisterCodeFixesAsync(context).Wait();
 
                 if (actions.Count == 0)

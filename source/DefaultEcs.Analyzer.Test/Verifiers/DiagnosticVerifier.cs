@@ -217,7 +217,7 @@ namespace TestHelper
         /// <returns>The Diagnostics formatted as a string</returns>
         private static string FormatDiagnostics(DiagnosticAnalyzer analyzer, params Diagnostic[] diagnostics)
         {
-            StringBuilder builder = new StringBuilder();
+            StringBuilder builder = new();
             for (int i = 0; i < diagnostics.Length; ++i)
             {
                 builder.Append("// ").AppendLine(diagnostics[i].ToString());

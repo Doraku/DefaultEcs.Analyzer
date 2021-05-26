@@ -9,7 +9,7 @@ namespace DefaultEcs.Analyzer.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class ConstructorParameterAttributeAnalyzer : DiagnosticAnalyzer
     {
-        public static readonly DiagnosticDescriptor InheritEntitySystemRule = new DiagnosticDescriptor(
+        public static readonly DiagnosticDescriptor InheritEntitySystemRule = new(
             "DEA0013",
             "The ConstructorParameter attribute should be used on a member of a type which inherit from AEntitySetSystem or AEntityMultiMapSystem",
             "Remove the ConstructorParameter attribute from this member or change the inherited type of the current type",
@@ -18,7 +18,7 @@ namespace DefaultEcs.Analyzer.Analyzers
             true,
             "The ConstructorParameter attribute should be used on a member of a type which inherit from AEntitySetSystem or AEntityMultiMapSystem.");
 
-        public static readonly DiagnosticDescriptor UpdateAttributeRule = new DiagnosticDescriptor(
+        public static readonly DiagnosticDescriptor UpdateAttributeRule = new(
             "DEA0014",
             "The ConstructorParameter attribute should be used on a member of a type which has a method with a Update attribute",
             "Remove the ConstructorParameter attribute from this member or add an Update attribute on a method of its type",
@@ -27,7 +27,7 @@ namespace DefaultEcs.Analyzer.Analyzers
             true,
             "The ConstructorParameter attribute should be used on a member of a type which has a method with a Update attribute.");
 
-        public static readonly DiagnosticDescriptor NoConstructorRule = new DiagnosticDescriptor(
+        public static readonly DiagnosticDescriptor NoConstructorRule = new(
             "DEA0015",
             "The ConstructorParameter attribute should be used on a member of a type which has no constructor defined",
             "Remove the ConstructorParameter attribute from this member or remove its type constructor",

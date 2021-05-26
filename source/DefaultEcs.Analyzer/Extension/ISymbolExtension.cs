@@ -31,16 +31,9 @@ namespace DefaultEcs.Analyzer.Extension
 
         public static bool HasWithPredicateAttribute(this ISymbol symbol) => symbol.GetAttributes().Any(a => a.ToString() == "DefaultEcs.System.WithPredicateAttribute");
 
-        public static bool HasUpdateAttribute(this ISymbol symbol, out bool useBuffer)
-        {
-            AttributeData data = symbol.GetAttributes().FirstOrDefault(a => a.AttributeClass.ToString() == "DefaultEcs.System.UpdateAttribute");
+        public static bool HasUpdateAttribute(this ISymbol symbol) => symbol.GetAttributes().Any(a => a.ToString() == "DefaultEcs.System.UpdateAttribute");
 
-            useBuffer = data?.ConstructorArguments.Length is 1 && data.ConstructorArguments[0].Value is true;
-
-            return data != null;
-        }
-
-        public static bool HasUpdateAttribute(this ISymbol symbol) => symbol.HasUpdateAttribute(out bool _);
+        public static bool HasUseBufferAttribute(this ISymbol symbol) => symbol.GetAttributes().Any(a => a.ToString() == "DefaultEcs.System.UseBufferAttribute");
 
         public static bool HasConstructorParameterAttribute(this ISymbol symbol) => symbol.GetAttributes().Any(a => a.ToString() == "DefaultEcs.System.ConstructorParameterAttribute");
 

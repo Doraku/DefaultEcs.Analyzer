@@ -9,7 +9,7 @@ namespace DefaultEcs.Analyzer.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class UpdateAttributeAnalyzer : DiagnosticAnalyzer
     {
-        public static readonly DiagnosticDescriptor InheritEntitySystemRule = new DiagnosticDescriptor(
+        public static readonly DiagnosticDescriptor InheritEntitySystemRule = new(
             "DEA0006",
             "The Update attribute should be used on a method of a type which inherit from AEntitySetSystem or AEntityMultiMapSystem",
             "Remove the Update attribute from this method or change the inherited type of the current type",
@@ -18,7 +18,7 @@ namespace DefaultEcs.Analyzer.Analyzers
             true,
             "The Update attribute should be used on a method of a type which inherit from AEntitySetSystem or AEntityMultiMapSystem.");
 
-        public static readonly DiagnosticDescriptor SingleUpdateAttributeRule = new DiagnosticDescriptor(
+        public static readonly DiagnosticDescriptor SingleUpdateAttributeRule = new(
             "DEA0007",
             "Only one method can be decorated with the Update attribute in a given type",
             "Remove extra Update attribute",
@@ -27,7 +27,7 @@ namespace DefaultEcs.Analyzer.Analyzers
             true,
             "Only one method can be decorated with the Update attribute in a given type.");
 
-        public static readonly DiagnosticDescriptor NoUpdateOverrideRule = new DiagnosticDescriptor(
+        public static readonly DiagnosticDescriptor NoUpdateOverrideRule = new(
             "DEA0008",
             "The Update attribute can't be used when an override of the Update method is already present",
             "Remove either the Update attribute or the method Update override",
@@ -36,7 +36,7 @@ namespace DefaultEcs.Analyzer.Analyzers
             true,
             "The Update attribute can't be used when an override of the Update method is already present.");
 
-        public static readonly DiagnosticDescriptor NoOutParameterRule = new DiagnosticDescriptor(
+        public static readonly DiagnosticDescriptor NoOutParameterRule = new(
             "DEA0009",
             "No out parameter can be present in the method decorated by the Update attribute",
             "Remove the Update attribute or change the parameter modifier",
@@ -45,7 +45,7 @@ namespace DefaultEcs.Analyzer.Analyzers
             true,
             "No out parameter can be present in the method decorated by the Update attribute.");
 
-        public static readonly DiagnosticDescriptor PartialTypeRule = new DiagnosticDescriptor(
+        public static readonly DiagnosticDescriptor PartialTypeRule = new(
             "DEA0010",
             "The type containing the method decorated by the Update attribute should be partial",
             "Mark the parent type as partial",
@@ -54,7 +54,7 @@ namespace DefaultEcs.Analyzer.Analyzers
             true,
             "The type containing the method decorated by the Update attribute should be partial.");
 
-        public static readonly DiagnosticDescriptor VoidReturnRule = new DiagnosticDescriptor(
+        public static readonly DiagnosticDescriptor VoidReturnRule = new(
             "DEA0011",
             "The method decorated by the Update attribute should return void",
             "Change the return type of the method to void",
@@ -63,7 +63,7 @@ namespace DefaultEcs.Analyzer.Analyzers
             true,
             "The method decorated by the Update attribute should return void.");
 
-        public static readonly DiagnosticDescriptor NoGenericRule = new DiagnosticDescriptor(
+        public static readonly DiagnosticDescriptor NoGenericRule = new(
             "DEA0012",
             "The method decorated by the Update attribute should not be generic",
             "Remove the genericity of the method or the Update attribute",
@@ -72,7 +72,7 @@ namespace DefaultEcs.Analyzer.Analyzers
             true,
             "The method decorated by the Update attribute should not be generic.");
 
-        public static readonly DiagnosticDescriptor UpdateAttributeRule = new DiagnosticDescriptor(
+        public static readonly DiagnosticDescriptor UpdateAttributeRule = new(
             "DEA0016",
             "The method of a parameter decorated with a Added or Changed attribute should be decorated wit the Update attribute",
             "Remove the attribute or add the Update attribute to the parameter methode",
