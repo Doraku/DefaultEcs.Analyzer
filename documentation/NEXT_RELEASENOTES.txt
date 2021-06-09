@@ -1,0 +1,1 @@
+added WorldComponent attribute to initialize entity system members from world component

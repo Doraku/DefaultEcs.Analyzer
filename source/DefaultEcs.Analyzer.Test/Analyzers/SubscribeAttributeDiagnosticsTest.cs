@@ -1,9 +1,8 @@
-using DefaultEcs.Analyzer.Analyzers;
 using Microsoft.CodeAnalysis.Diagnostics;
 using TestHelper;
 using Xunit;
 
-namespace DefaultEcs.Analyzer.Test.Analyzers
+namespace DefaultEcs.Analyzer.Analyzers
 {
     public class SubscribeAttributeAnalyserTest : DiagnosticVerifier
     {

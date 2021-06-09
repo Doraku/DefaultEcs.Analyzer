@@ -3,7 +3,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 
-namespace DefaultEcs.Analyzer.Extension
+namespace DefaultEcs.Analyzer.Extensions
 {
     internal static class ISymbolExtension
     {
@@ -36,6 +36,8 @@ namespace DefaultEcs.Analyzer.Extension
         public static bool HasUseBufferAttribute(this ISymbol symbol) => symbol.GetAttributes().Any(a => a.ToString() == "DefaultEcs.System.UseBufferAttribute");
 
         public static bool HasConstructorParameterAttribute(this ISymbol symbol) => symbol.GetAttributes().Any(a => a.ToString() == "DefaultEcs.System.ConstructorParameterAttribute");
+
+        public static bool HasWorldComponentAttribute(this ISymbol symbol) => symbol.GetAttributes().Any(a => a.ToString() == "DefaultEcs.System.WorldComponentAttribute");
 
         public static bool HasAddedAttribute(this ISymbol symbol) => symbol.GetAttributes().Any(a => a.ToString() == "DefaultEcs.System.AddedAttribute");
 

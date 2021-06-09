@@ -2,7 +2,7 @@
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
-namespace DefaultEcs.Analyzer.Extension
+namespace DefaultEcs.Analyzer.Extensions
 {
     internal static class SuppressionAnalysisContextExtension
     {

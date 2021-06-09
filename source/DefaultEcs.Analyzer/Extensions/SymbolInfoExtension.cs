@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using Microsoft.CodeAnalysis;
 
-namespace DefaultEcs.Analyzer.Extension
+namespace DefaultEcs.Analyzer.Extensions
 {
     public static class SymbolInfoExtension
     {

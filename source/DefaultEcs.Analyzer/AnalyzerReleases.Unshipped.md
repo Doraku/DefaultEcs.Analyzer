@@ -3,5 +3,6 @@
 ### New Rules
 Rule ID | Category | Severity | Notes
 --------|----------|----------|-------
-DEA0017 | Correctness | Info | UseBufferAttributeAnalyzer
-DEA0018 | Correctness | Info | UseBufferAttributeAnalyzer
+DEA0019 | Correctness | Info | WorldComponentAttributeAnalyzer
+DEA0020 | Correctness | Info | WorldComponentAttributeAnalyzer
+DEA0021 | Correctness | Info | WorldComponentAttributeAnalyzer

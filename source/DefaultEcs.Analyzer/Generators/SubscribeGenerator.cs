@@ -4,7 +4,7 @@
 //using Microsoft.CodeAnalysis;
 //using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-//namespace DefaultEcs.Analyzer
+//namespace DefaultEcs.Analyzer.Generators
 //{
 //    [Generator]
 //    public sealed class SubscribeGenerator : ISourceGenerator

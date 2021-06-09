@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace DefaultEcs.Analyzer.Extension
+namespace DefaultEcs.Analyzer.Extensions
 {
     internal static class ITypeSymbolExtension
     {

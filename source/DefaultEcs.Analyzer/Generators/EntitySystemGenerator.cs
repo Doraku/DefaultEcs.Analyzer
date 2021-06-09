@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using DefaultEcs.Analyzer.Extension;
+using DefaultEcs.Analyzer.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 
-namespace DefaultEcs.Analyzer
+namespace DefaultEcs.Analyzer.Generators
 {
     [Generator]
     public sealed class EntitySystemGenerator : ISourceGenerator
@@ -41,6 +41,13 @@ namespace DefaultEcs.System
     /// </summary>
     [CompilerGenerated, AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
     internal sealed class ConstructorParameterAttribute : Attribute
+    { }
+
+    /// <summary>
+    /// Used on a field or property that need to be set in the generated constructor from a World component.
+    /// </summary>
+    [CompilerGenerated, AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
+    internal sealed class WorldComponentAttribute : Attribute
     { }
 
     /// <summary>
@@ -132,28 +139,47 @@ namespace DefaultEcs.System
             string constructorVisibility = type.Constructors.All(c => c.IsImplicitlyDeclared) ? (type.IsAbstract ? "protected" : "public") : "private";
 
             List<(string type, string name, string parameterName)> extraParameters = new();
+            List<(string type, string name)> worldComponents = new();
 
-            void Add(ITypeSymbol t, string name)
+            void AddConstructorParameter(ITypeSymbol t, string name)
             {
                 string parameterName = name.TrimStart('_');
                 parameterName = char.ToLower(parameterName[0]) + parameterName.Substring(1);
                 extraParameters.Add((GetName(t), name != parameterName ? name : $"this.{name}", parameterName));
             }
 
-            foreach (IFieldSymbol field in type.GetMembers().OfType<IFieldSymbol>().Where(f => !f.IsStatic && !f.IsConst && f.HasConstructorParameterAttribute()))
+            void AddWorldComponent(ITypeSymbol t, string name) => worldComponents.Add((GetName(t), name));
+
+            foreach (IFieldSymbol field in type.GetMembers().OfType<IFieldSymbol>().Where(f => !f.IsStatic && !f.IsConst))
             {
-                Add(field.Type, field.Name);
+                if (field.HasConstructorParameterAttribute())
+                {
+                    AddConstructorParameter(field.Type, field.Name);
+                }
+
+                if (field.HasWorldComponentAttribute())
+                {
+                    AddWorldComponent(field.Type, field.Name);
+                }
             }
 
-            foreach (IPropertySymbol property in type.GetMembers().OfType<IPropertySymbol>().Where(p => !p.IsStatic && p.HasConstructorParameterAttribute()))
+            foreach (IPropertySymbol property in type.GetMembers().OfType<IPropertySymbol>().Where(p => !p.IsStatic))
             {
-                Add(property.Type, property.Name);
+                if (property.HasConstructorParameterAttribute())
+                {
+                    AddConstructorParameter(property.Type, property.Name);
+                }
+
+                if (property.HasWorldComponentAttribute())
+                {
+                    AddWorldComponent(property.Type, property.Name);
+                }
             }
 
             code.AppendLine("        [CompilerGenerated]");
             code.Append("        ").Append(constructorVisibility).Append(' ').Append(type.Name).Append('(').Append(parameters).Append(string.Concat(extraParameters.Select(p => $", {p.type} {p.parameterName}").Distinct())).AppendLine(")");
             code.Append("            : base(").Append(baseParameters).AppendLine(")");
-            if (extraParameters.Count is 0)
+            if (extraParameters.Count is 0 && worldComponents.Count is 0)
             {
                 code.AppendLine("        { }");
             }
@@ -163,6 +189,11 @@ namespace DefaultEcs.System
                 foreach ((string _, string memberName, string parameterName) in extraParameters)
                 {
                     code.Append("            ").Append(memberName).Append(" = ").Append(parameterName).AppendLine(";");
+                }
+                foreach ((string memberType, string memberName) in worldComponents)
+                {
+                    code.Append("            ").Append(memberName).Append(" = World.Has<").Append(memberType).Append(">() ? World.Get<").Append(memberType)
+                        .Append(">() : throw new ArgumentException(\"Underlying World does not have a component of type ").Append(memberType).AppendLine("\");");
                 }
                 code.AppendLine("        }");
             }

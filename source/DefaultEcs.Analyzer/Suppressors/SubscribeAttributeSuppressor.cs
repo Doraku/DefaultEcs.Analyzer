@@ -1,5 +1,5 @@
 using System.Collections.Immutable;
-using DefaultEcs.Analyzer.Extension;
+using DefaultEcs.Analyzer.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 

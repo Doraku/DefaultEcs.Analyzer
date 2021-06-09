@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
+using DefaultEcs.Analyzer.Generators;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Xunit;
 
-namespace DefaultEcs.Analyzer.Test
+namespace DefaultEcs.Analyzer
 {
     public class GeneratorTest
     {
@@ -47,8 +48,11 @@ namespace DefaultEcs.Benchmark.DefaultEcs
         [ConstructorParameter]
         public readonly int lol;
 
-        [EntityCommandRecorder]
-        public readonly EntityCommandRecorder _recorder;
+        [WorldComponent]
+        private readonly int _test1;
+
+        [WorldComponent]
+        public int Gna1 { get; }
 
         [Update]
         private void Update(float state, ref TParam p, Dictionary<int, TParam>[] pouet, double? azd, Dictionaty<int, string> agre, in Speed speed, in Components<int> ints, [Notify] ref Position position)

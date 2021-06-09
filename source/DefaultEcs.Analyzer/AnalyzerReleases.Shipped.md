@@ -22,3 +22,5 @@ DEA0013 | Correctness | Info | ConstructorParameterAttributeAnalyzer
 DEA0014 | Correctness | Info | ConstructorParameterAttributeAnalyzer
 DEA0015 | Correctness | Info | ConstructorParameterAttributeAnalyzer
 DEA0016 | Correctness | Info | UpdateAttributeAnalyzer
+DEA0017 | Correctness | Info | UseBufferAttributeAnalyzer
+DEA0018 | Correctness | Info | UseBufferAttributeAnalyzer

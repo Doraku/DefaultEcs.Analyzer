@@ -4,7 +4,7 @@ using Xunit;
 
 namespace DefaultEcs.Analyzer.Analyzers
 {
-    public class ConstructorParameterAttributeAnalyzerTest : DiagnosticVerifier
+    public class WorldComponentAttributeAnalyzerTest : DiagnosticVerifier
     {
         #region Tests
 
@@ -20,7 +20,7 @@ namespace DefaultEcs.System
     { }
 
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
-    internal sealed class ConstructorParameterAttribute : Attribute
+    internal sealed class WorldComponentAttribute : Attribute
     { }
 }
 
@@ -28,10 +28,10 @@ namespace DummyNamespace
 {
     partial class DummyClass : AEntitySetSystem<float>
     {
-        [ConstructorParameter]
+        [WorldComponent]
         private readonly int field;
 
-        [ConstructorParameter]
+        [WorldComponent]
         private readonly int Property { get; }
 
         [Update]
@@ -53,7 +53,7 @@ namespace DefaultEcs.System
     { }
 
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
-    internal sealed class ConstructorParameterAttribute : Attribute
+    internal sealed class WorldComponentAttribute : Attribute
     { }
 }
 
@@ -61,7 +61,7 @@ namespace DummyNamespace
 {
     partial class DummyClass
     {
-        [ConstructorParameter]
+        [WorldComponent]
         private readonly int field;
 
         [Update]
@@ -70,7 +70,7 @@ namespace DummyNamespace
     }
 }
 ",
-            new DiagnosticResult(new(20, 30), ConstructorParameterAttributeAnalyzer.InheritEntitySystemRule));
+            new DiagnosticResult(new(20, 30), WorldComponentAttributeAnalyzer.InheritEntitySystemRule));
 
         [Fact]
         public void Should_report_When_do_not_have_UpdateAttribute_method() => VerifyCSharpDiagnostic(
@@ -84,7 +84,7 @@ namespace DefaultEcs.System
     { }
 
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
-    internal sealed class ConstructorParameterAttribute : Attribute
+    internal sealed class WorldComponentAttribute : Attribute
     { }
 }
 
@@ -92,7 +92,7 @@ namespace DummyNamespace
 {
     partial class DummyClass : AEntitySetSystem<float>
     {
-        [ConstructorParameter]
+        [WorldComponent]
         private readonly int field;
 
         void Update(in Entity entity, float state, object dummy)
@@ -100,7 +100,7 @@ namespace DummyNamespace
     }
 }
 ",
-            new DiagnosticResult(new(20, 30), ConstructorParameterAttributeAnalyzer.UpdateAttributeRule));
+            new DiagnosticResult(new(20, 30), WorldComponentAttributeAnalyzer.UpdateAttributeRule));
 
         [Fact]
         public void Should_report_When_has_constructor() => VerifyCSharpDiagnostic(
@@ -114,7 +114,7 @@ namespace DefaultEcs.System
     { }
 
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
-    internal sealed class ConstructorParameterAttribute : Attribute
+    internal sealed class WorldComponentAttribute : Attribute
     { }
 }
 
@@ -122,7 +122,7 @@ namespace DummyNamespace
 {
     partial class DummyClass : AEntitySetSystem<float>
     {
-        [ConstructorParameter]
+        [WorldComponent]
         private readonly int field;
 
         public DummyClass(World world)
@@ -135,13 +135,13 @@ namespace DummyNamespace
     }
 }
 ",
-            new DiagnosticResult(new(20, 30), ConstructorParameterAttributeAnalyzer.NoConstructorRule));
+            new DiagnosticResult(new(20, 30), WorldComponentAttributeAnalyzer.NoConstructorRule));
 
         #endregion
 
         #region DiagnosticVerifier
 
-        protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer() => new ConstructorParameterAttributeAnalyzer();
+        protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer() => new WorldComponentAttributeAnalyzer();
 
         #endregion
     }

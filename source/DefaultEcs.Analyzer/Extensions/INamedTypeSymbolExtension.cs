@@ -3,7 +3,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 
-namespace DefaultEcs.Analyzer.Extension
+namespace DefaultEcs.Analyzer.Extensions
 {
     internal static class INamedTypeSymbolExtension
     {
