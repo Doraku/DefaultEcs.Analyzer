@@ -192,7 +192,7 @@ namespace DefaultEcs.System
                 }
                 foreach ((string memberType, string memberName) in worldComponents)
                 {
-                    code.Append("            ").Append(memberName).Append(" = World.Has<").Append(memberType).Append(">() ? World.Get<").Append(memberType)
+                    code.Append("            ").Append(memberName).Append(" = world.Has<").Append(memberType).Append(">() ? world.Get<").Append(memberType)
                         .Append(">() : throw new ArgumentException(\"Underlying World does not have a component of type ").Append(memberType).AppendLine("\");");
                 }
                 code.AppendLine("        }");
