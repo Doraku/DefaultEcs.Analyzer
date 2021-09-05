@@ -22,12 +22,12 @@ namespace DefaultEcs.Analyzer.Analyzers
 
         public static readonly DiagnosticDescriptor NoEntityModificationRule = new(
             "DEA0005",
-            "Entity modification method '{0}' used inside the Update method of AEntitySetSystem or AEntityMultiMapSystem which does not use buffer",
+            "Entity modification method '{0}' used inside the Update method of AEntitySetSystem, AEntitySortedSetSystem or AEntityMultiMapSystem which does not use buffer",
             "Use an EntityCommandRecorder or change constructor to use buffer",
             DiagnosticCategory.RuntimeError,
             DiagnosticSeverity.Warning,
             true,
-            "Entity modification methods are not thread safe and should not be used inside the Update method of AEntitySetSystem or AEntityMultiMapSystem.");
+            "Entity modification methods are not thread safe and should not be used inside the Update method of AEntitySetSystem, AEntitySortedSetSystem or AEntityMultiMapSystem.");
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(NoEntityModificationRule);
 
@@ -45,7 +45,7 @@ namespace DefaultEcs.Analyzer.Analyzers
                 && literal.Token.Value is true;
 
             if (context.ContainingSymbol is IMethodSymbol method
-                && (method.ContainingType.IsAEntitySetSystem(out IList<ITypeSymbol> genericTypes) || method.ContainingType.IsAEntityMultiMapSystem(out genericTypes))
+                && (method.ContainingType.IsAEntitySetSystem(out IList<ITypeSymbol> genericTypes) || method.ContainingType.IsAEntitySortedSetSystem(out genericTypes) || method.ContainingType.IsAEntityMultiMapSystem(out genericTypes))
                 && ((method.HasUpdateAttribute() && !method.HasUseBufferAttribute()) || method.IsEntitySystemUpdateOverride(genericTypes))
                 && !method.ContainingType.Constructors.Any(c => c.Locations.Select(l => l.SourceTree.GetRoot().FindNode(l.SourceSpan)).OfType<ConstructorDeclarationSyntax>().Any(CheckUseBuffer)))
             {

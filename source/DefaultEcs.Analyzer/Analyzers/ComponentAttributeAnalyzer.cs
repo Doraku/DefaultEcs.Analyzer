@@ -19,21 +19,21 @@ namespace DefaultEcs.Analyzer.Analyzers
 
         public static readonly DiagnosticDescriptor ContainingTypeInheritEntitySystemRule = new(
             "DEA0003",
-            "WithPredicateAttribute used on a method which is not a member of AEntitySetSystem or AEntityMultiMapSystem",
+            "WithPredicateAttribute used on a method which is not a member of AEntitySetSystem, AEntitySortedSetSystem or AEntityMultiMapSystem",
             "Remove WithPredicateAttribute from the '{0}' method",
             DiagnosticCategory.Correctness,
             DiagnosticSeverity.Info,
             true,
-            "WithPredicateAttribute should only be used on method member of AEntitySetSystem or AEntityMultiMapSystem.");
+            "WithPredicateAttribute should only be used on method member of AEntitySetSystem, AEntitySortedSetSystem or AEntityMultiMapSystem.");
 
         public static readonly DiagnosticDescriptor InheritEntitySystemRule = new(
             "DEA0004",
-            "Component attribute used on a type which is not derived from AEntitySetSystem or AEntityMultiMapSystem",
+            "Component attribute used on a type which is not derived from AEntitySetSystem, AEntitySortedSetSystem or AEntityMultiMapSystem",
             "Remove '{1}' from the '{0}' type",
             DiagnosticCategory.Correctness,
             DiagnosticSeverity.Info,
             true,
-            "Component attribute should only be used on type which is derived from AEntitySetSystem or AEntityMultiMapSystem.");
+            "Component attribute should only be used on type which is derived from AEntitySetSystem, AEntitySortedSetSystem or AEntityMultiMapSystem.");
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(CorrectSignatureRule, ContainingTypeInheritEntitySystemRule, InheritEntitySystemRule);
 

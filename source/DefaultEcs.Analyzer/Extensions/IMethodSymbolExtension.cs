@@ -15,6 +15,7 @@ namespace DefaultEcs.Analyzer.Extensions
         {
             return (genericTypes != null
                     || method.ContainingType.IsAEntitySetSystem(out genericTypes)
+                    || method.ContainingType.IsAEntitySortedSetSystem(out genericTypes)
                     || method.ContainingType.IsAEntityMultiMapSystem(out genericTypes))
                 && method.IsOverride
                 && method.Name == "Update"

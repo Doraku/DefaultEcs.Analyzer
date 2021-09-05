@@ -11,12 +11,12 @@ namespace DefaultEcs.Analyzer.Analyzers
     {
         public static readonly DiagnosticDescriptor InheritEntitySystemRule = new(
             "DEA0013",
-            "The ConstructorParameter attribute should be used on a member of a type which inherit from AEntitySetSystem or AEntityMultiMapSystem",
+            "The ConstructorParameter attribute should be used on a member of a type which inherit from AEntitySetSystem, AEntitySortedSetSystem or AEntityMultiMapSystem",
             "Remove the ConstructorParameter attribute from this member or change the inherited type of the current type",
             DiagnosticCategory.Correctness,
             DiagnosticSeverity.Info,
             true,
-            "The ConstructorParameter attribute should be used on a member of a type which inherit from AEntitySetSystem or AEntityMultiMapSystem.");
+            "The ConstructorParameter attribute should be used on a member of a type which inherit from AEntitySetSystem, AEntitySortedSetSystem or AEntityMultiMapSystem.");
 
         public static readonly DiagnosticDescriptor UpdateAttributeRule = new(
             "DEA0014",

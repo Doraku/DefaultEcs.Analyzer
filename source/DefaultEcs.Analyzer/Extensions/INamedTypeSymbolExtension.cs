@@ -1,21 +1,25 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
 using Microsoft.CodeAnalysis;
 
 namespace DefaultEcs.Analyzer.Extensions
 {
     internal static class INamedTypeSymbolExtension
     {
+        private const string AEntitySetSystem = "DefaultEcs.System.AEntitySetSystem<T>";
+        private const string AEntitySortedSetSystem = "DefaultEcs.System.AEntitySortedSetSystem<TState, TComponent>";
+        private const string AEntityMultiMapSystem = "DefaultEcs.System.AEntityMultiMapSystem<TState, TKey>";
+
         private static readonly ImmutableHashSet<string> _entitySystemTypes = ImmutableHashSet.Create(
-            "DefaultEcs.System.AEntitySetSystem<T>",
-            "DefaultEcs.System.AEntityMultiMapSystem<TState, TKey>");
+            AEntitySetSystem,
+            AEntitySortedSetSystem,
+            AEntityMultiMapSystem);
 
         public static bool IsEntitySystem(this INamedTypeSymbol type) => !(type is null) && (_entitySystemTypes.Contains(type.ConstructedFrom.ToString()) || type.BaseType.IsEntitySystem());
 
         public static bool IsAEntitySetSystem(this INamedTypeSymbol type, out IList<ITypeSymbol> genericTypes)
         {
-            if (type?.ConstructedFrom.ToString() is "DefaultEcs.System.AEntitySetSystem<T>")
+            if (type?.ConstructedFrom.ToString() is AEntitySetSystem)
             {
                 genericTypes = type.TypeArguments;
                 return true;
@@ -26,9 +30,22 @@ namespace DefaultEcs.Analyzer.Extensions
             return type?.BaseType.IsAEntitySetSystem(out genericTypes) is true;
         }
 
+        public static bool IsAEntitySortedSetSystem(this INamedTypeSymbol type, out IList<ITypeSymbol> genericTypes)
+        {
+            if (type?.ConstructedFrom.ToString() is AEntitySortedSetSystem)
+            {
+                genericTypes = type.TypeArguments;
+                return true;
+            }
+
+            genericTypes = null;
+
+            return type?.BaseType.IsAEntitySortedSetSystem(out genericTypes) is true;
+        }
+
         public static bool IsAEntityMultiMapSystem(this INamedTypeSymbol type, out IList<ITypeSymbol> genericTypes)
         {
-            if (type?.ConstructedFrom.ToString() is "DefaultEcs.System.AEntityMultiMapSystem<TState, TKey>")
+            if (type?.ConstructedFrom.ToString() is AEntityMultiMapSystem)
             {
                 genericTypes = type.TypeArguments;
                 return true;

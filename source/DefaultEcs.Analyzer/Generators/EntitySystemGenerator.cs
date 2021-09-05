@@ -237,7 +237,8 @@ namespace DefaultEcs.System
                     HashSet<ITypeSymbol> addedTypes = new(SymbolEqualityComparer.IncludeNullability);
                     HashSet<ITypeSymbol> changedTypes = new(SymbolEqualityComparer.IncludeNullability);
 
-                    if (type.IsAEntitySetSystem(out IList<ITypeSymbol> genericTypes))
+                    if (type.IsAEntitySetSystem(out IList<ITypeSymbol> genericTypes)
+                        || type.IsAEntitySortedSetSystem(out genericTypes))
                     {
                         updateOverrideParameters = $"{GetName(genericTypes[0])} state";
                     }
@@ -319,6 +320,10 @@ namespace DefaultEcs.System
                         if (useBuffer)
                         {
                             WriteConstructor(code, type, "World world", "world, CreateEntityContainer, true");
+                        }
+                        else if (type.IsAEntitySortedSetSystem(out IList<ITypeSymbol> _))
+                        {
+                            WriteConstructor(code, type, "World world", "world, CreateEntityContainer");
                         }
                         else
                         {
