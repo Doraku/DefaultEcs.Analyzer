@@ -1,1 +1,2 @@
 added validation and code generation for AEntitySortedSetSystem
+added check for World operations in entity systems
