@@ -11,12 +11,16 @@ namespace DefaultEcs.Analyzer.Extensions
             "DefaultEcs.Entity",
             "System.ReadOnlySpan<DefaultEcs.Entity>");
 
-        public static bool IsEntitySystemUpdateOverride(this IMethodSymbol method, IList<ITypeSymbol> genericTypes = null)
+        public static bool IsEntitySystemUpdateOverride(this IMethodSymbol method)
         {
-            return (genericTypes != null
-                    || method.ContainingType.IsAEntitySetSystem(out genericTypes)
-                    || method.ContainingType.IsAEntitySortedSetSystem(out genericTypes)
-                    || method.ContainingType.IsAEntityMultiMapSystem(out genericTypes))
+            if (!method.ContainingType.IsAEntitySetSystem(out IList<ITypeSymbol> genericTypes)
+                && !method.ContainingType.IsAEntityMultiMapSystem(out genericTypes)
+                && method.ContainingType.IsAEntitySortedSetSystem(out genericTypes))
+            {
+                genericTypes = genericTypes.Take(1).ToList();
+            }
+
+            return genericTypes != null
                 && method.IsOverride
                 && method.Name == "Update"
                 && method.ReturnsVoid

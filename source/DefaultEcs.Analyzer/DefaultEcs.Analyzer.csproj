@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <None Include="..\..\image\logo.png" Pack="true" PackagePath="\" Visible="false"/>
+    <None Include="DefaultEcs.Analyzer.props" Pack="true" PackagePath="build" />
     <None Update="tools\*.ps1" CopyToOutputDirectory="Always" Pack="true" PackagePath="tools" />
     <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
     <AdditionalFiles Include="AnalyzerReleases.Shipped.md" />

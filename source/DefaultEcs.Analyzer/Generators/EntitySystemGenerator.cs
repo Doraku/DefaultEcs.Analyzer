@@ -205,6 +205,12 @@ namespace DefaultEcs.System
 
         public void Execute(GeneratorExecutionContext context)
         {
+            if (context.AnalyzerConfigOptions.GlobalOptions.TryGetValue("build_property.DisableDefaultEcsEntitySystemGenerator", out string disableDefaultEcsEntitySystemGenerator)
+                && disableDefaultEcsEntitySystemGenerator.Equals("true", StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+
             Compilation compilation = GenerateAttributes(context);
             int systemCount = 0;
 

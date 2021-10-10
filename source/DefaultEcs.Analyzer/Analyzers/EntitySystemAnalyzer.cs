@@ -65,15 +65,15 @@ namespace DefaultEcs.Analyzer.Analyzers
                 && literal.Token.Value is true;
 
             if (context.ContainingSymbol is IMethodSymbol method
-                && (method.ContainingType.IsAEntitySetSystem(out IList<ITypeSymbol> genericTypes) || method.ContainingType.IsAEntitySortedSetSystem(out genericTypes) || method.ContainingType.IsAEntityMultiMapSystem(out genericTypes))
-                && ((method.HasUpdateAttribute() && !method.HasUseBufferAttribute()) || method.IsEntitySystemUpdateOverride(genericTypes))
+                && method.ContainingType.IsEntitySystem()
+                && ((method.HasUpdateAttribute() && !method.HasUseBufferAttribute()) || method.IsEntitySystemUpdateOverride())
                 && !method.ContainingType.Constructors.Any(c => c.Locations.Select(l => l.SourceTree.GetRoot().FindNode(l.SourceSpan)).OfType<ConstructorDeclarationSyntax>().Any(CheckUseBuffer)))
             {
                 foreach (InvocationExpressionSyntax invocation in method.DeclaringSyntaxReferences.SelectMany(r => r.GetSyntax().DescendantNodes().OfType<InvocationExpressionSyntax>()))
                 {
                     IMethodSymbol invokedMethod = context.Operation.SemanticModel.GetSymbolInfo(invocation.Expression).As<IMethodSymbol>();
 
-                    if (invokedMethod?.ContainingType.IsWorld() is true && _worldChangeMethods.Contains(invokedMethod.Name) && !method.ContainingType.IsAEntitySortedSetSystem(out genericTypes))
+                    if (invokedMethod?.ContainingType.IsWorld() is true && _worldChangeMethods.Contains(invokedMethod.Name) && !method.ContainingType.IsAEntitySortedSetSystem(out IList<ITypeSymbol> _))
                     {
                         context.ReportDiagnostic(Diagnostic.Create(NoWorldModificationRule, invocation.GetLocation(), invokedMethod.Name));
                     }
