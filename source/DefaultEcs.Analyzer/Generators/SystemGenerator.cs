@@ -11,7 +11,7 @@ using Microsoft.CodeAnalysis.Text;
 namespace DefaultEcs.Analyzer.Generators
 {
     [Generator]
-    public sealed class EntitySystemGenerator : ISourceGenerator
+    public sealed class SystemGenerator : ISourceGenerator
     {
         private static Compilation GenerateAttributes(GeneratorExecutionContext context)
         {
@@ -205,8 +205,8 @@ namespace DefaultEcs.System
 
         public void Execute(GeneratorExecutionContext context)
         {
-            if (context.AnalyzerConfigOptions.GlobalOptions.TryGetValue("build_property.DisableDefaultEcsEntitySystemGenerator", out string disableDefaultEcsEntitySystemGenerator)
-                && disableDefaultEcsEntitySystemGenerator.Equals("true", StringComparison.OrdinalIgnoreCase))
+            if (context.AnalyzerConfigOptions.GlobalOptions.TryGetValue("build_property.DisableDefaultEcsSystemGenerator", out string disableDefaultEcsSystemGenerator)
+                && disableDefaultEcsSystemGenerator.Equals("true", StringComparison.OrdinalIgnoreCase))
             {
                 return;
             }

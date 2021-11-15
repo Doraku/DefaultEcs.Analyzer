@@ -102,7 +102,7 @@ namespace DefaultEcs.Benchmark.DefaultEcs
             //    return (diagnostics, "");
             //}
 
-            ISourceGenerator generator = new EntitySystemGenerator();
+            ISourceGenerator generator = new SystemGenerator();
 
             var driver = CSharpGeneratorDriver.Create(generator);
             driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);

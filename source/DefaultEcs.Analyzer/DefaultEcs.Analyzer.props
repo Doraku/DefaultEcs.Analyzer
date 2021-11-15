@@ -1,5 +1,5 @@
 ﻿<Project>
     <ItemGroup>
-        <CompilerVisibleProperty Include="DisableDefaultEcsEntitySystemGenerator" />
+        <CompilerVisibleProperty Include="DisableDefaultEcsSystemGenerator" />
     </ItemGroup>
 </Project>
