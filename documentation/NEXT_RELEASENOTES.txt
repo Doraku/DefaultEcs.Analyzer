@@ -1,3 +1,8 @@
-added validation and code generation for AEntitySortedSetSystem
-added check for World operations in entity systems
-added DisableDefaultEcsSystemGenerator property to disable the system generator
+## New features
+
+- added validation and code generation for AEntitySortedSetSystem
+- added check for World operations in entity systems
+- added DisableDefaultEcsSystemGenerator property to disable the system generator
+
+## Bug fixes
+- fixed CreateEntityContainer generating not non-nullable compliant code (#7)

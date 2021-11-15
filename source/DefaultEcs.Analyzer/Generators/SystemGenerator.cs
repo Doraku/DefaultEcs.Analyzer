@@ -127,7 +127,7 @@ namespace DefaultEcs.System
 
             foreach (IMethodSymbol predicate in type.GetMembers().OfType<IMethodSymbol>().Where(m => m.HasWithPredicateAttribute() && m.Parameters.Length == 1))
             {
-                code.Append("            .With<").Append(GetName(predicate.Parameters[0].Type)).Append(">(").Append(predicate.IsStatic ? string.Empty : $"(sender as {type.Name}).").Append(predicate.Name).AppendLine(")");
+                code.Append("            .With<").Append(GetName(predicate.Parameters[0].Type)).Append(">(").Append(predicate.IsStatic ? string.Empty : $"(({type.Name})sender).").Append(predicate.Name).AppendLine(")");
             }
 
             code.Append("            ").AppendLine(mapType is null ? ".AsSet();" : $".AsMultiMap<{GetName(mapType)}>(sender as IEqualityComparer<{GetName(mapType)}>);");
