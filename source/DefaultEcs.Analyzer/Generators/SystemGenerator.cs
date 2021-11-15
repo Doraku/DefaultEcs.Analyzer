@@ -16,8 +16,7 @@ namespace DefaultEcs.Analyzer.Generators
         private static Compilation GenerateAttributes(GeneratorExecutionContext context)
         {
             const string helpersSource =
-@"
-using System;
+@"using System;
 using System.Runtime.CompilerServices;
 
 namespace DefaultEcs.System
@@ -63,7 +62,8 @@ namespace DefaultEcs.System
     [CompilerGenerated, AttributeUsage(AttributeTargets.Parameter)]
     internal sealed class ChangedAttribute : Attribute
     { }
-}";
+}
+";
 
             context.AddSource("Attributes", helpersSource);
 
@@ -77,7 +77,8 @@ namespace DefaultEcs.System
         private static void WriteFactory(
             StringBuilder code,
             INamedTypeSymbol type,
-            ITypeSymbol mapType,
+            string containerType,
+            ITypeSymbol componentType,
             IEnumerable<ITypeSymbol> withTypes,
             IEnumerable<ITypeSymbol> addedTypes,
             IEnumerable<ITypeSymbol> changedTypes)
@@ -91,23 +92,25 @@ namespace DefaultEcs.System
             }
 
             code.AppendLine("        [CompilerGenerated]");
-            code.Append("        ").Append("private static ").Append(mapType is null ? "EntitySet" : $"EntityMultiMap<{GetName(mapType)}>").AppendLine(" CreateEntityContainer(object sender, World world) => world");
-            code.Append("            ").AppendLine(type.HasDisabledAttribute() ? ".GetDisabledEntities()" : ".GetEntities()");
+            code.Append("        ").Append("private static ").Append("Entity").Append(containerType).Append(componentType is null ? string.Empty : $"<{GetName(componentType)}>").AppendLine(" CreateEntityContainer(object sender, World world)");
+            code.AppendLine("        {");
+            code.AppendLine("            var query = world");
+            code.Append("                ").AppendLine(type.HasDisabledAttribute() ? ".GetDisabledEntities()" : ".GetEntities()");
 
-            WriteRules("            ", "With", withTypes);
-            WriteRules("            ", "WhenAdded", addedTypes);
-            WriteRules("            ", "WhenChanged", changedTypes);
+            WriteRules("                ", "With", withTypes);
+            WriteRules("                ", "WhenAdded", addedTypes);
+            WriteRules("                ", "WhenChanged", changedTypes);
 
             foreach (AttributeData attribute in type.GetComponentAttributes())
             {
-                void Write(string methodName) => WriteRules("            ", methodName, attribute.ConstructorArguments[0].Values.Select(v => v.Value).OfType<ITypeSymbol>());
+                void Write(string methodName) => WriteRules("                ", methodName, attribute.ConstructorArguments[0].Values.Select(v => v.Value).OfType<ITypeSymbol>());
 
                 void WriteEither(string methodName)
                 {
                     ITypeSymbol[] types = attribute.ConstructorArguments[0].Values.Select(v => v.Value).OfType<ITypeSymbol>().ToArray();
 
-                    WriteRules("            ", $"{methodName}Either", types.Take(1));
-                    WriteRules("                ", "Or", types.Skip(1));
+                    WriteRules("                ", $"{methodName}Either", types.Take(1));
+                    WriteRules("                    ", "Or", types.Skip(1));
                 }
 
                 switch (attribute.AttributeClass.Name)
@@ -127,10 +130,27 @@ namespace DefaultEcs.System
 
             foreach (IMethodSymbol predicate in type.GetMembers().OfType<IMethodSymbol>().Where(m => m.HasWithPredicateAttribute() && m.Parameters.Length == 1))
             {
-                code.Append("            .With<").Append(GetName(predicate.Parameters[0].Type)).Append(">(").Append(predicate.IsStatic ? string.Empty : $"(({type.Name})sender).").Append(predicate.Name).AppendLine(")");
+                code.Append("                .With<").Append(GetName(predicate.Parameters[0].Type)).Append(">(").Append(predicate.IsStatic ? string.Empty : $"(({type.Name})sender).").Append(predicate.Name).AppendLine(")");
             }
 
-            code.Append("            ").AppendLine(mapType is null ? ".AsSet();" : $".AsMultiMap<{GetName(mapType)}>(sender as IEqualityComparer<{GetName(mapType)}>);");
+            code.Length -= Environment.NewLine.Length;
+            code.AppendLine(";");
+
+            switch (containerType)
+            {
+                case "Set":
+                    code.AppendLine("            return query.AsSet();");
+                    break;
+
+                case "SortedSet":
+                    code.AppendLine($"            return sender is IComparer<{GetName(componentType)}> comparer ? query.AsSortedSet<{GetName(componentType)}>(comparer) : query.AsSortedSet<{GetName(componentType)}>();");
+                    break;
+
+                case "MultiMap":
+                    code.AppendLine($"            return sender is IEqualityComparer<{GetName(componentType)}> comparer ? query.AsMultiMap<{GetName(componentType)}>(comparer) : query.AsMultiMap<{GetName(componentType)}>();");
+                    break;
+            }
+            code.AppendLine("        }");
             code.AppendLine();
         }
 
@@ -243,14 +263,23 @@ namespace DefaultEcs.System
                     HashSet<ITypeSymbol> addedTypes = new(SymbolEqualityComparer.IncludeNullability);
                     HashSet<ITypeSymbol> changedTypes = new(SymbolEqualityComparer.IncludeNullability);
 
+                    string containerType = null;
+
                     if (type.IsAEntitySetSystem(out IList<ITypeSymbol> genericTypes)
                         || type.IsAEntitySortedSetSystem(out genericTypes))
                     {
+                        containerType = genericTypes.Count is 1 ? "Set" : "SortedSet";
                         updateOverrideParameters = $"{GetName(genericTypes[0])} state";
                     }
                     else if (type.IsAEntityMultiMapSystem(out genericTypes))
                     {
+                        containerType = "MultiMap";
                         updateOverrideParameters = $"{GetName(genericTypes[0])} state, in {GetName(genericTypes[1])} key";
+                    }
+
+                    if (containerType is null)
+                    {
+                        continue;
                     }
 
                     foreach (IParameterSymbol parameter in method.Parameters)
@@ -263,7 +292,7 @@ namespace DefaultEcs.System
                         {
                             parameters.Add("state");
                         }
-                        else if (genericTypes.Count > 1 && SymbolEqualityComparer.Default.Equals(parameter.Type, genericTypes[1]) && parameter.RefKind != RefKind.Ref)
+                        else if (containerType is "MultiMap" && SymbolEqualityComparer.Default.Equals(parameter.Type, genericTypes[1]) && parameter.RefKind != RefKind.Ref)
                         {
                             parameters.Add("key");
                         }
@@ -339,7 +368,7 @@ namespace DefaultEcs.System
                         }
                     }
 
-                    WriteFactory(code, type, genericTypes.Skip(1).FirstOrDefault(), withTypes, addedTypes, changedTypes);
+                    WriteFactory(code, type, containerType, genericTypes.Skip(1).FirstOrDefault(), withTypes, addedTypes, changedTypes);
 
                     code.AppendLine("        [CompilerGenerated]");
                     code.Append("        protected override void Update(").Append(updateOverrideParameters).AppendLine(", ReadOnlySpan<Entity> entities)");
