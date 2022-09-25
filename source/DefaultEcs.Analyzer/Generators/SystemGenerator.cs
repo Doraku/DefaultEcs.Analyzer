@@ -358,7 +358,7 @@ namespace DefaultEcs.System
                         }
                         else if (type.IsAEntitySortedSetSystem(out IList<ITypeSymbol> _))
                         {
-                            WriteConstructor(code, type, "World world", "world, CreateEntityContainer");
+                            WriteConstructor(code, type, "World world", "world, CreateEntityContainer, false");
                         }
                         else
                         {

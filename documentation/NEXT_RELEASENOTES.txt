@@ -1,0 +1,3 @@
+## Bug fixes
+
+- fixed AEntitySortedSetSystem generation when not using buffer (#11)
