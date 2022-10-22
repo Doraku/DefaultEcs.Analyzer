@@ -3,7 +3,3 @@
 ### New Rules
 Rule ID | Category | Severity | Notes
 --------|----------|----------|-------
-DEA0019 | Correctness | Info | WorldComponentAttributeAnalyzer
-DEA0020 | Correctness | Info | WorldComponentAttributeAnalyzer
-DEA0021 | Correctness | Info | WorldComponentAttributeAnalyzer
-DEA0022 | RuntimeError | Warning | EntitySystemAnalyzer

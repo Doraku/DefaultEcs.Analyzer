@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using DefaultEcs.Analyzer.Extensions;
@@ -87,15 +88,15 @@ namespace DefaultEcs.System
             {
                 foreach (ITypeSymbol t in types)
                 {
-                    code.Append(indentation).Append(".").Append(name).Append('<').Append(GetName(t)).AppendLine(">()");
+                    code.Append(indentation).Append('.').Append(name).Append('<').Append(GetName(t)).AppendLine(">()");
                 }
             }
 
-            code.AppendLine("        [CompilerGenerated]");
-            code.Append("        ").Append("private static ").Append("Entity").Append(containerType).Append(componentType is null ? string.Empty : $"<{GetName(componentType)}>").AppendLine(" CreateEntityContainer(object sender, World world)");
-            code.AppendLine("        {");
-            code.AppendLine("            var query = world");
-            code.Append("                ").AppendLine(type.HasDisabledAttribute() ? ".GetDisabledEntities()" : ".GetEntities()");
+            code.AppendLine("        [CompilerGenerated]")
+                .Append("        ").Append("private static ").Append("Entity").Append(containerType).Append(componentType is null ? string.Empty : $"<{GetName(componentType)}>").AppendLine(" CreateEntityContainer(object sender, World world)")
+                .AppendLine("        {")
+                .AppendLine("            var query = world")
+                .Append("                ").AppendLine(type.HasDisabledAttribute() ? ".GetDisabledEntities()" : ".GetEntities()");
 
             WriteRules("                ", "With", withTypes);
             WriteRules("                ", "WhenAdded", addedTypes);
@@ -143,15 +144,15 @@ namespace DefaultEcs.System
                     break;
 
                 case "SortedSet":
-                    code.AppendLine($"            return sender is IComparer<{GetName(componentType)}> comparer ? query.AsSortedSet<{GetName(componentType)}>(comparer) : query.AsSortedSet<{GetName(componentType)}>();");
+                    code.Append("            return sender is IComparer<").Append(GetName(componentType)).Append("> comparer ? query.AsSortedSet<").Append(GetName(componentType)).Append(">(comparer) : query.AsSortedSet<").Append(GetName(componentType)).AppendLine(">();");
                     break;
 
                 case "MultiMap":
-                    code.AppendLine($"            return sender is IEqualityComparer<{GetName(componentType)}> comparer ? query.AsMultiMap<{GetName(componentType)}>(comparer) : query.AsMultiMap<{GetName(componentType)}>();");
+                    code.Append("            return sender is IEqualityComparer<").Append(GetName(componentType)).Append("> comparer ? query.AsMultiMap<").Append(GetName(componentType)).Append(">(comparer) : query.AsMultiMap<").Append(GetName(componentType)).AppendLine(">();");
                     break;
             }
-            code.AppendLine("        }");
-            code.AppendLine();
+            code.AppendLine("        }")
+                .AppendLine();
         }
 
         private static void WriteConstructor(StringBuilder code, INamedTypeSymbol type, string parameters, string baseParameters)
@@ -164,7 +165,7 @@ namespace DefaultEcs.System
             void AddConstructorParameter(ITypeSymbol t, string name)
             {
                 string parameterName = name.TrimStart('_');
-                parameterName = char.ToLower(parameterName[0]) + parameterName.Substring(1);
+                parameterName = $"{char.ToLower(parameterName[0], CultureInfo.InvariantCulture)}{parameterName.Substring(1)}";
                 extraParameters.Add((GetName(t), name != parameterName ? name : $"this.{name}", parameterName));
             }
 
@@ -196,9 +197,9 @@ namespace DefaultEcs.System
                 }
             }
 
-            code.AppendLine("        [CompilerGenerated]");
-            code.Append("        ").Append(constructorVisibility).Append(' ').Append(type.Name).Append('(').Append(parameters).Append(string.Concat(extraParameters.Select(p => $", {p.type} {p.parameterName}").Distinct())).AppendLine(")");
-            code.Append("            : base(").Append(baseParameters).AppendLine(")");
+            code.AppendLine("        [CompilerGenerated]")
+                .Append("        ").Append(constructorVisibility).Append(' ').Append(type.Name).Append('(').Append(parameters).Append(string.Concat(extraParameters.Select(p => $", {p.type} {p.parameterName}").Distinct())).AppendLine(")")
+                .Append("            : base(").Append(baseParameters).AppendLine(")");
             if (extraParameters.Count is 0 && worldComponents.Count is 0)
             {
                 code.AppendLine("        { }");
@@ -330,25 +331,25 @@ namespace DefaultEcs.System
 
                     List<INamedTypeSymbol> parentTypes = type.GetParentTypes().Skip(1).Reverse().ToList();
 
-                    code.AppendLine("using System;");
-                    code.AppendLine("using System.Collections.Generic;");
-                    code.AppendLine("using System.Runtime.CompilerServices;");
-                    code.AppendLine("using DefaultEcs;");
-                    code.AppendLine("using DefaultEcs.Command;");
-                    code.AppendLine("using DefaultEcs.System;");
-                    code.AppendLine("using DefaultEcs.Threading;");
-                    code.AppendLine();
-                    code.Append("namespace ").AppendLine(type.GetNamespace());
-                    code.AppendLine("{");
+                    code.AppendLine("using System;")
+                        .AppendLine("using System.Collections.Generic;")
+                        .AppendLine("using System.Runtime.CompilerServices;")
+                        .AppendLine("using DefaultEcs;")
+                        .AppendLine("using DefaultEcs.Command;")
+                        .AppendLine("using DefaultEcs.System;")
+                        .AppendLine("using DefaultEcs.Threading;")
+                        .AppendLine()
+                        .Append("namespace ").AppendLine(type.GetNamespace())
+                        .AppendLine("{");
 
                     foreach (INamedTypeSymbol parentType in parentTypes)
                     {
-                        code.Append("    ").Append(parentType.DeclaredAccessibility.ToCode()).Append(" partial ").Append(parentType.TypeKind.ToCode()).Append(' ').AppendLine(parentType.GetName());
-                        code.AppendLine("    {");
+                        code.Append("    ").Append(parentType.DeclaredAccessibility.ToCode()).Append(" partial ").Append(parentType.TypeKind.ToCode()).Append(' ').AppendLine(parentType.GetName())
+                            .AppendLine("    {");
                     }
 
-                    code.Append("    ").Append(type.DeclaredAccessibility.ToCode()).Append(" partial class ").AppendLine(type.GetName());
-                    code.AppendLine("    {");
+                    code.Append("    ").Append(type.DeclaredAccessibility.ToCode()).Append(" partial class ").AppendLine(type.GetName())
+                        .AppendLine("    {");
 
                     if (type.Constructors.All(c => c.IsImplicitlyDeclared))
                     {
@@ -370,9 +371,9 @@ namespace DefaultEcs.System
 
                     WriteFactory(code, type, containerType, genericTypes.Skip(1).FirstOrDefault(), withTypes, addedTypes, changedTypes);
 
-                    code.AppendLine("        [CompilerGenerated]");
-                    code.Append("        protected override void Update(").Append(updateOverrideParameters).AppendLine(", ReadOnlySpan<Entity> entities)");
-                    code.AppendLine("        {");
+                    code.AppendLine("        [CompilerGenerated]")
+                        .Append("        protected override void Update(").Append(updateOverrideParameters).AppendLine(", ReadOnlySpan<Entity> entities)")
+                        .AppendLine("        {");
 
                     foreach (string component in components)
                     {
@@ -384,12 +385,12 @@ namespace DefaultEcs.System
                         code.AppendLine();
                     }
 
-                    code.AppendLine("            foreach (ref readonly Entity entity in entities)");
-                    code.AppendLine("            {");
-                    code.Append("                ").Append(method.Name).Append('(').Append(string.Join(", ", parameters)).AppendLine(");");
-                    code.AppendLine("            }");
-                    code.AppendLine("        }");
-                    code.AppendLine("    }");
+                    code.AppendLine("            foreach (ref readonly Entity entity in entities)")
+                        .AppendLine("            {")
+                        .Append("                ").Append(method.Name).Append('(').Append(string.Join(", ", parameters)).AppendLine(");")
+                        .AppendLine("            }")
+                        .AppendLine("        }")
+                        .AppendLine("    }");
 
                     for (int i = 0; i < parentTypes.Count; ++i)
                     {

@@ -1,11 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup Label="Compilation">
-    <LangVersion>latest</LangVersion>
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\..\image\logo.png" Pack="true" PackagePath="\" Visible="false"/>
+    <None Include="..\..\image\logo.png" Pack="true" PackagePath="\" Visible="false" />
     <None Include="DefaultEcs.Analyzer.props" Pack="true" PackagePath="build" />
     <None Update="tools\*.ps1" CopyToOutputDirectory="Always" Pack="true" PackagePath="tools" />
     <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
@@ -14,9 +13,9 @@
   </ItemGroup>
 
   <ItemGroup Label="Reference">
-    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.2" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.9.0" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All"/>
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.3" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.3.1" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
   </ItemGroup>
 
   <PropertyGroup Label="Package">
@@ -52,8 +51,8 @@
   </PropertyGroup>
 
   <Target Name="PreparePackageReleaseNotesFromFile" BeforeTargets="GenerateNuspec">
-    <ReadLinesFromFile File="../../documentation/NEXT_RELEASENOTES.txt" >
-      <Output TaskParameter="Lines" ItemName="ReleaseNotesLines"/>
+    <ReadLinesFromFile File="../../documentation/NEXT_RELEASENOTES.txt">
+      <Output TaskParameter="Lines" ItemName="ReleaseNotesLines" />
     </ReadLinesFromFile>
     <PropertyGroup>
       <PackageReleaseNotes>@(ReleaseNotesLines, '%0a')</PackageReleaseNotes>

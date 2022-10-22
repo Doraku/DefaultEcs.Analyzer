@@ -63,12 +63,12 @@ namespace DefaultEcs.Benchmark.DefaultEcs
     }
 }";
 
-            var (diagnostics, output) = GetGeneratedOutput(source);
+            (ImmutableArray<Diagnostic> diagnostics, string output) = GetGeneratedOutput(source);
 
             if (diagnostics.Length > 0)
             {
                 Console.WriteLine("Diagnostics:");
-                foreach (var diag in diagnostics)
+                foreach (Diagnostic diag in diagnostics)
                 {
                     Console.WriteLine("   " + diag.ToString());
                 }
@@ -81,11 +81,10 @@ namespace DefaultEcs.Benchmark.DefaultEcs
 
         private static (ImmutableArray<Diagnostic>, string) GetGeneratedOutput(string source)
         {
-            var syntaxTree = CSharpSyntaxTree.ParseText(source);
+            SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(source);
 
-            var references = new List<MetadataReference>();
-            Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
-            foreach (var assembly in assemblies)
+            List<MetadataReference> references = new();
+            foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
                 if (!assembly.IsDynamic)
                 {
@@ -93,7 +92,7 @@ namespace DefaultEcs.Benchmark.DefaultEcs
                 }
             }
 
-            var compilation = CSharpCompilation.Create("foo", new SyntaxTree[] { syntaxTree }, references, new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+            CSharpCompilation compilation = CSharpCompilation.Create("foo", new SyntaxTree[] { syntaxTree }, references, new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
             //ImmutableArray<Diagnostic> diagnostics = compilation.GetDiagnostics();
 
@@ -104,8 +103,8 @@ namespace DefaultEcs.Benchmark.DefaultEcs
 
             ISourceGenerator generator = new SystemGenerator();
 
-            var driver = CSharpGeneratorDriver.Create(generator);
-            driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
+            CSharpGeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
+            driver.RunGeneratorsAndUpdateCompilation(compilation, out Compilation outputCompilation, out ImmutableArray<Diagnostic> diagnostics);
 
             return (diagnostics, string.Join(Environment.NewLine, outputCompilation.SyntaxTrees.Skip(1)));
         }

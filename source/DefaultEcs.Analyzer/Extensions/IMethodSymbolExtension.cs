@@ -25,7 +25,7 @@ namespace DefaultEcs.Analyzer.Extensions
                 && method.Name == "Update"
                 && method.ReturnsVoid
                 && method.Parameters.Length == genericTypes.Count + 1
-                && genericTypes.Select((p, i) => SymbolEqualityComparer.Default.Equals(method.Parameters[i].Type, p)).All(b => b is true)
+                && genericTypes.Select((p, i) => SymbolEqualityComparer.Default.Equals(method.Parameters[i].Type, p)).All(b => b)
                 && _updateParameters.Contains(method.Parameters[genericTypes.Count].Type.ToString());
         }
     }

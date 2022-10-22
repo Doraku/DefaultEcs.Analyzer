@@ -15,7 +15,7 @@ namespace DefaultEcs.Analyzer.Extensions
             AEntitySortedSetSystem,
             AEntityMultiMapSystem);
 
-        public static bool IsEntitySystem(this INamedTypeSymbol type) => !(type is null) && (_entitySystemTypes.Contains(type.ConstructedFrom.ToString()) || type.BaseType.IsEntitySystem());
+        public static bool IsEntitySystem(this INamedTypeSymbol type) => type is not null && (_entitySystemTypes.Contains(type.ConstructedFrom.ToString()) || type.BaseType.IsEntitySystem());
 
         public static bool IsAEntitySetSystem(this INamedTypeSymbol type, out IList<ITypeSymbol> genericTypes)
         {

@@ -1,8 +1,8 @@
 ﻿namespace DefaultEcs.Analyzer
 {
-    internal sealed class DiagnosticCategory
+    internal static class DiagnosticCategory
     {
-        public static readonly string Correctness = "Correctness";
-        public static readonly string RuntimeError = "Runtime Error";
+        public const string Correctness = "Correctness";
+        public const string RuntimeError = "Runtime Error";
     }
 }

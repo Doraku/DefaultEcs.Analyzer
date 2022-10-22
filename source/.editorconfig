@@ -1,4 +1,82 @@
 ﻿[*.cs]
 
-# RS1024: Compare symbols correctly
-dotnet_diagnostic.RS1024.severity = none
+dotnet_analyzer_diagnostic.severity = warning
+
+# CA1014: Mark assemblies with CLSCompliant
+dotnet_diagnostic.CA1014.severity = none
+
+# CA1062: Validate arguments of public methods
+dotnet_diagnostic.CA1062.severity = none
+
+# CA1815: Override equals and operator equals on value types
+dotnet_diagnostic.CA1815.severity = none
+
+# CA1819: Properties should not return arrays
+dotnet_diagnostic.CA1819.severity = none
+
+# IDE0010: Add missing cases
+dotnet_diagnostic.IDE0010.severity = none
+
+# IDE0022: Use block body for methods
+dotnet_diagnostic.IDE0022.severity = none
+
+# IDE0058: Expression value is never used
+dotnet_diagnostic.IDE0058.severity = none
+
+# IDE0061: Use block body for local functions
+dotnet_diagnostic.IDE0061.severity = none
+
+# IDE0072: Add missing cases
+dotnet_diagnostic.IDE0072.severity = none
+
+# RCS1189: Add or remove region name.
+dotnet_diagnostic.RCS1189.severity = none
+
+# RCS1238: Avoid nested ?: operators.
+dotnet_diagnostic.RCS1238.severity = none
+
+# RCS9007: Use return value.
+dotnet_diagnostic.RCS9007.severity = none
+
+[**{.Test}/**.cs]
+
+# CA1305: Specify IFormatProvider
+dotnet_diagnostic.CA1305.severity = none
+
+# CA1303: Do not pass literals as localized parameters
+dotnet_diagnostic.CA1303.severity = none
+
+# CA1707: Identifiers should not contain underscores
+dotnet_diagnostic.CA1707.severity = none
+
+[**{.Test}/Helpers/**.cs]
+
+dotnet_analyzer_diagnostic.severity = none
+
+# CA1307: Specify StringComparison for clarity
+dotnet_diagnostic.CA1307.severity = none
+
+# CA1310: Specify StringComparison for correctness
+dotnet_diagnostic.CA1310.severity = none
+
+# CA2000: Dispose objects before losing scope
+dotnet_diagnostic.CA2000.severity = none
+
+# CA2201: Do not raise reserved exception types
+dotnet_diagnostic.CA2201.severity = none
+
+[**{.Test}/Verifiers/**.cs]
+
+dotnet_analyzer_diagnostic.severity = none
+
+# CA1307: Specify StringComparison for clarity
+dotnet_diagnostic.CA1307.severity = none
+
+# CA1310: Specify StringComparison for correctness
+dotnet_diagnostic.CA1310.severity = none
+
+# CA2000: Dispose objects before losing scope
+dotnet_diagnostic.CA2000.severity = none
+
+# CA2201: Do not raise reserved exception types
+dotnet_diagnostic.CA2201.severity = none
