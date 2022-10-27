@@ -61,7 +61,7 @@ You can request the `Entity` as a parameter too, this is usefull of you want to 
     }
 ```
 
-If you need to define more exotic rules, all attributes (`WithAttribute`, `WithoutAttribute`, `DisabledAttribute`, ...) that you normally definie on the parent type will also be used.
+If you need to define more exotic rules, all attributes (`WithAttribute`, `WithoutAttribute`, `DisabledAttribute`, ...) that you normally define on the parent type will also be used.
 ```csharp
     [Without(typeof(bool))]
     public sealed partial class MovementSystem : AEntitySetSystem<float>
