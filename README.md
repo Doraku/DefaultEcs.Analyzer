@@ -1,5 +1,5 @@
 ![DefaultEcs](https://github.com/Doraku/DefaultEcs/blob/master/image/DefaultEcsLogo.png)
-This project provides a set of analizers to enhance the Visual Studio experience when working on a DefaultEcs project by adding diagnostics or by removing general C# diagnostics that do not apply.  
+This project provides a set of analyzers to enhance the Visual Studio experience when working on a DefaultEcs project by adding diagnostics or by removing general C# diagnostics that do not apply.  
 The main repo for DefaultEcs is [here](https://github.com/Doraku/DefaultEcs/), this repo is specific to the analyzer.
 
 [Here](https://github.com/Doraku/DefaultEcs.Analyzer/blob/master/documentation/index.md) is the list of analyzers and suppressors defined in this project.
